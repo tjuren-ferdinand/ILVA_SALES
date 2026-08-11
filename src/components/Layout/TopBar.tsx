@@ -4,7 +4,7 @@ import { Bell, User } from 'lucide-react'
 
 export function TopBar() {
   return (
-    <div className="mb-8 hidden items-center justify-between gap-4 md:flex">
+    <div className="mb-8 hidden items-center justify-between gap-4 md:flex print:hidden">
       <div className="max-w-2xl flex-1">
         <GlobalSearch variant="compact" />
       </div>

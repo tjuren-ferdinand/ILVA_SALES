@@ -16,14 +16,17 @@ export function PreviewScreen({
   return (
     <div className="surface p-5 md:p-6">
       <div className="mb-6 flex items-center justify-between gap-4">
-        <h2 className="text-lg font-semibold text-foreground">Förhandsvisa offert</h2>
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Förhandsvisa offert</h2>
+          <p className="text-sm text-muted">Så här ser offerten ut för kunden.</p>
+        </div>
         <div className="flex gap-2">
           <button
             onClick={onPrint}
             className="inline-flex items-center gap-2 rounded-2xl bg-foreground px-4 py-2.5 text-sm font-medium text-surface transition hover:bg-foreground/90"
           >
             <Printer className="h-4 w-4" strokeWidth={1.5} />
-            Skriv ut
+            Skriv ut / PDF
           </button>
           <button
             onClick={onClose}
@@ -34,9 +37,7 @@ export function PreviewScreen({
           </button>
         </div>
       </div>
-      <div className="rounded-2xl border border-border bg-white p-6 md:p-10">
-        <QuotePreview quote={quote} totals={totals} />
-      </div>
+      <QuotePreview quote={quote} totals={totals} />
     </div>
   )
 }

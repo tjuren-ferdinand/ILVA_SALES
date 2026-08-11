@@ -12,7 +12,7 @@ export function Sidebar({
 }) {
   return (
     <>
-      <aside className="fixed left-6 top-6 z-30 hidden h-[calc(100vh-3rem)] w-72 flex-col rounded-[2rem] border border-white/30 bg-white/40 p-6 shadow-2xl backdrop-blur-2xl md:flex">
+      <aside className="fixed left-6 top-6 z-30 hidden h-[calc(100vh-3rem)] w-72 flex-col rounded-[2rem] border border-white/30 bg-white/40 p-6 shadow-2xl backdrop-blur-2xl md:flex print:hidden">
         <div className="mb-8 select-none px-2">
           <div className="text-2xl font-semibold tracking-tight text-foreground">ILVA</div>
           <div className="text-sm font-medium text-muted">Sales Hub</div>

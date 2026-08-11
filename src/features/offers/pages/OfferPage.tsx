@@ -52,7 +52,8 @@ export function OfferPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div>
+      <div className="print:hidden space-y-6">
       {view === 'workspace' ? (
         <>
           <PageHeader
@@ -114,6 +115,7 @@ export function OfferPage() {
           onPrint={handlePrint}
         />
       )}
+      </div>
 
       <div className="hidden print:!block fixed inset-0 z-[100] overflow-auto bg-white p-6 md:p-12">
         <QuotePreview quote={quote} totals={totals} />

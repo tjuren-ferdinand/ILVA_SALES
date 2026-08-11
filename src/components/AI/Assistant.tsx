@@ -54,7 +54,7 @@ export function Assistant() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-foreground text-surface shadow-2xl transition hover:scale-105 hover:shadow-card"
+          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-foreground text-surface shadow-2xl transition hover:scale-105 hover:shadow-card print:hidden"
           aria-label="Öppna säljassistent"
         >
           <Sparkles className="h-5 w-5" strokeWidth={1.5} />
@@ -62,7 +62,7 @@ export function Assistant() {
       )}
 
       {open && (
-        <div className="fixed bottom-4 right-4 left-4 z-50 flex flex-col rounded-[2rem] border border-white/50 bg-white/85 p-4 shadow-2xl backdrop-blur-2xl md:bottom-6 md:right-6 md:left-auto md:h-[32rem] md:w-[26rem]">
+        <div className="fixed bottom-4 right-4 left-4 z-50 flex flex-col rounded-[2rem] border border-white/50 bg-white/85 p-4 shadow-2xl backdrop-blur-2xl md:bottom-6 md:right-6 md:left-auto md:h-[32rem] md:w-[26rem] print:hidden">
           <div className="flex items-center justify-between pb-3">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-surface">

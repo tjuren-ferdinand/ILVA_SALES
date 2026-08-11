@@ -5,7 +5,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const navigate = useNavigate()
 
   return (
-    <header className="fixed left-4 right-4 top-4 z-40 flex h-16 items-center justify-between rounded-2xl border border-white/30 bg-white/60 px-4 shadow-soft backdrop-blur-2xl md:hidden">
+    <header className="fixed left-4 right-4 top-4 z-40 flex h-16 items-center justify-between rounded-2xl border border-white/30 bg-white/60 px-4 shadow-soft backdrop-blur-2xl md:hidden print:hidden">
       <button
         onClick={onMenuClick}
         className="flex h-10 w-10 items-center justify-center rounded-full text-foreground transition hover:bg-white/30"
