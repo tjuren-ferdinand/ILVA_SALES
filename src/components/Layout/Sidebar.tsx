@@ -17,7 +17,7 @@ export function Sidebar({
           <div className="text-2xl font-semibold tracking-tight text-foreground">ILVA</div>
           <div className="text-sm font-medium text-muted">Sales Hub</div>
         </div>
-        <nav className="flex-1 space-y-1 overflow-y-auto" aria-label="Huvudnavigering">
+        <nav className="flex-1 space-y-1 overflow-y-auto scrollbar-glass" aria-label="Huvudnavigering">
           {topNav.map((item) => (
             <NavItem key={item.path} item={item} onClick={undefined} />
           ))}
@@ -50,7 +50,7 @@ export function Sidebar({
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <nav className="flex-1 space-y-1 overflow-y-auto" aria-label="Huvudnavigering">
+            <nav className="flex-1 space-y-1 overflow-y-auto scrollbar-glass" aria-label="Huvudnavigering">
               {topNav.map((item) => (
                 <NavItem key={item.path} item={item} onClick={onClose} />
               ))}

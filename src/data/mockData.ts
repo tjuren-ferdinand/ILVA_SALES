@@ -458,9 +458,67 @@ const _updates: UpdateItem[] = [
   },
 ]
 
+function translateDanish(text: string): string {
+  const map: [string, string][] = [
+    ['Exclusive senge', 'Exclusive sängar'],
+    ['Sengegavle', 'Sänggavlar'],
+    ['Sengeben', 'Sängben'],
+    ['Sovesofaer', 'Bäddsoffor'],
+    ['Sofaborde', 'Soffbord'],
+    ['Spisebordsstole', 'Matstolar'],
+    ['Spiseborde', 'Matbord'],
+    ['Opbevaringsmøbler', 'Förvaringsmöbler'],
+    ['Skriveborde', 'Skrivbord'],
+    ['Kontorstole', 'Kontorsstolar'],
+    ['Entrémøbler', 'Hallmöbler'],
+    ['Havemøbler', 'Utemöbler'],
+    ['Tæpper', 'Mattor'],
+    ['Spejle', 'Speglar'],
+    ['Sofaer', 'Soffor'],
+    ['Lænestole', 'Fåtöljer'],
+    ['Lamper', 'Lampor'],
+    ['senge', 'sängar'],
+    ['sove', 'bädd'],
+    ['sofa', 'soffa'],
+    ['møbler', 'möbler'],
+  ]
+  let result = text
+  for (const [from, to] of map) {
+    result = result.replace(new RegExp(from, 'gi'), to)
+  }
+  result = result
+    .replace(/Fast lav pris/gi, 'Fast lågt pris')
+    .replace(/Max rabatt för/gi, 'Maximal rabatt för')
+    .replace(/Max rabatt/gi, 'Maximal rabatt')
+    .replace(/för lænestole/gi, 'för fåtöljer')
+    .replace(/för sovesofaer/gi, 'för bäddsoffor')
+    .replace(/för sofaborde/gi, 'för soffbord')
+    .replace(/för spisebordsstole/gi, 'för matstolar')
+    .replace(/för spiseborde/gi, 'för matbord')
+    .replace(/för opbevaringsmøbler/gi, 'för förvaringsmöbler')
+    .replace(/för skriveborde/gi, 'för skrivbord')
+    .replace(/før kontorstole/gi, 'för kontorsstolar')
+    .replace(/för entrémøbler/gi, 'för hallmöbler')
+    .replace(/för havemøbler/gi, 'för utemöbler')
+    .replace(/för tæpper/gi, 'för mattor')
+    .replace(/för spejle/gi, 'för speglar')
+    .replace(/för sofaer/gi, 'för soffor')
+    .replace(/för lænestole/gi, 'för fåtöljer')
+  return result
+}
+
+function toSwedishDiscount(d: Discount): Discount {
+  return {
+    ...d,
+    name: translateDanish(d.name),
+    description: translateDanish(d.description),
+    keywords: d.keywords.map(translateDanish),
+  }
+}
+
 export const deliveryOptions = override?.deliveryOptions ?? _deliveryOptions
 export const codes = override?.codes ?? _codes
-export const discounts = override?.discounts ?? _discounts
+export const discounts = (override?.discounts ?? _discounts).map(toSwedishDiscount)
 export const productRules = override?.productRules ?? _productRules
 export const orderProcedures = override?.orderProcedures ?? _orderProcedures
 export const returnProcedures = override?.returnProcedures ?? _returnProcedures

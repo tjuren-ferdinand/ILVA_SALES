@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { CategoryCard } from '../components/ui/CategoryCard'
 import { QuickItem } from '../components/ui/QuickItem'
 import { UpdateCard } from '../components/ui/UpdateCard'
+import { PinGuard } from '../components/PinGuard'
 import { formatGreeting } from '../lib/utils'
 import { updates, deliveryOptions, discounts } from '../data/mockData'
 import type { DeliveryOption } from '../types'
@@ -14,6 +15,14 @@ const favorites = [
   { to: '/codes', icon: FileCode, title: 'Koder', description: 'Sökbara leveranskoder' },
   { to: '/products', icon: Sofa, title: 'Produkter', description: 'Produktregler och tips' },
 ]
+
+const sectionLabels: Record<string, string> = {
+  rule: 'Regel',
+  category: 'Kategori',
+  series: 'Serie',
+  bed: 'Säng',
+  högsta: 'Högsta',
+}
 
 const quickItems = [
   { to: '/codes', title: 'Vanliga leveranskoder', description: 'Mest använda just nu' },
@@ -158,42 +167,44 @@ export function Home() {
         )}
       </section>
 
-      <section className="surface p-6 md:p-8">
-        <div className="mb-5 flex items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3">
-              <Percent className="h-5 w-5 text-muted" strokeWidth={1.5} />
-              <h2 className="text-lg font-semibold text-foreground">Maxrabatter</h2>
+      <PinGuard>
+        <section className="surface p-6 md:p-8">
+          <div className="mb-5 flex items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3">
+                <Percent className="h-5 w-5 text-muted" strokeWidth={1.5} />
+                <h2 className="text-lg font-semibold text-foreground">Maxrabatter</h2>
+              </div>
+              <p className="mt-1 text-sm text-muted">Högsta tillåtna rabatt just nu.</p>
             </div>
-            <p className="mt-1 text-sm text-muted">Högsta tillåtna rabatt just nu.</p>
-          </div>
-          <Link
-            to="/discounts"
-            className="group inline-flex items-center gap-2 rounded-2xl border border-white/40 bg-white/40 px-4 py-2 text-sm font-medium text-foreground backdrop-blur-xl transition hover:bg-white/60"
-          >
-            Se alla
-            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" strokeWidth={1.5} />
-          </Link>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border border-white/40 bg-white/40 p-5 text-center backdrop-blur-xl">
-            <div className="text-3xl font-light text-foreground">{maxDiscount?.percent ?? 0} %</div>
-            <div className="mt-1 text-sm text-muted">{maxDiscount?.name ?? '—'}</div>
-            <div className="mt-1 text-xs uppercase tracking-wide text-muted">Högsta</div>
-          </div>
-          {discountSummary.map(([section, { name, percent }]) => (
-            <div
-              key={section}
-              className="rounded-2xl border border-white/40 bg-white/40 p-5 text-center backdrop-blur-xl"
+            <Link
+              to="/discounts"
+              className="group inline-flex items-center gap-2 rounded-2xl border border-white/40 bg-white/40 px-4 py-2 text-sm font-medium text-foreground backdrop-blur-xl transition hover:bg-white/60"
             >
-              <div className="text-3xl font-light text-foreground">{percent} %</div>
-              <div className="mt-1 text-sm text-muted truncate" title={name}>{name}</div>
-              <div className="mt-1 text-xs uppercase tracking-wide text-muted">{section}</div>
+              Se alla
+              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" strokeWidth={1.5} />
+            </Link>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-2xl border border-white/40 bg-white/40 p-5 text-center backdrop-blur-xl">
+              <div className="text-3xl font-light text-foreground">{maxDiscount?.percent ?? 0} %</div>
+              <div className="mt-1 text-sm text-muted">{maxDiscount?.name ?? '—'}</div>
+              <div className="mt-1 text-xs uppercase tracking-wide text-muted">Högsta</div>
             </div>
-          ))}
-        </div>
-      </section>
+            {discountSummary.map(([section, { name, percent }]) => (
+              <div
+                key={section}
+                className="rounded-2xl border border-white/40 bg-white/40 p-5 text-center backdrop-blur-xl"
+              >
+                <div className="text-3xl font-light text-foreground">{percent} %</div>
+                <div className="mt-1 text-sm text-muted truncate" title={name}>{name}</div>
+                <div className="mt-1 text-xs uppercase tracking-wide text-muted">{sectionLabels[section] ?? section}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </PinGuard>
 
       <section>
         <div className="mb-4 flex items-center justify-between">

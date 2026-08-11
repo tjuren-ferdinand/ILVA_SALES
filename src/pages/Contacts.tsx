@@ -24,17 +24,17 @@ export function Contacts() {
               </div>
             </div>
             <div className="mt-5 space-y-3">
-              <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background p-3">
-                <div className="flex items-center gap-2 text-sm text-foreground">
-                  <Phone className="h-4 w-4 text-muted" strokeWidth={1.5} />
-                  {c.phone}
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background p-3">
+                <div className="flex min-w-0 flex-1 items-center gap-2 text-sm text-foreground">
+                  <Phone className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.5} />
+                  <span className="truncate">{c.phone}</span>
                 </div>
                 <CopyButton text={c.phone} label="Kopiera" />
               </div>
-              <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background p-3">
-                <div className="flex items-center gap-2 text-sm text-foreground">
-                  <Mail className="h-4 w-4 text-muted" strokeWidth={1.5} />
-                  {c.email}
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background p-3">
+                <div className="flex min-w-0 flex-1 items-center gap-2 text-sm text-foreground">
+                  <Mail className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.5} />
+                  <span className="truncate">{c.email}</span>
                 </div>
                 <CopyButton text={c.email} label="Kopiera" />
               </div>

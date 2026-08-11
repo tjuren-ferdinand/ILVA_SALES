@@ -3,6 +3,7 @@ import { PageHeader } from '../components/ui/PageHeader'
 import { Badge } from '../components/ui/Badge'
 import { discounts } from '../data/mockData'
 import { Search, ShieldAlert, AlertTriangle } from 'lucide-react'
+import { PinGuard } from '../components/PinGuard'
 
 const sectionNames: Record<string, string> = {
   rule: 'Regler',
@@ -36,7 +37,8 @@ export function Discounts() {
   }, [query, tab])
 
   return (
-    <div className="space-y-6">
+    <PinGuard>
+      <div className="space-y-6">
       <PageHeader
         title="Max rabatt"
         description="Internt översikt över maxrabatt. Visas inte för kund."
@@ -112,5 +114,6 @@ export function Discounts() {
         </div>
       )}
     </div>
+    </PinGuard>
   )
 }
