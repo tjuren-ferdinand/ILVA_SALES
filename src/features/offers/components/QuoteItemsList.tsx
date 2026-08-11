@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
-import { Plus, Minus, Trash2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Plus, Minus, Trash2, Eye } from 'lucide-react'
 import { ProductImage } from './ui/ProductImage'
 import {
   formatPrice,
@@ -116,6 +117,14 @@ function QuoteItemRow({
                 {item.product.articleNumber} · {item.product.category}
               </p>
             </div>
+            <Link
+              to={`/showcase?product=${item.product.id}`}
+              target="_blank"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted transition hover:bg-white/40 hover:text-foreground"
+              aria-label="Visa kund"
+            >
+              <Eye className="h-4 w-4" strokeWidth={1.5} />
+            </Link>
             <button
               onClick={() => onRemove(item.id)}
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted transition hover:bg-white/40 hover:text-red-600"

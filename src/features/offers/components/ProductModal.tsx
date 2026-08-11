@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { X, Plus, Minus, ExternalLink } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { X, Plus, Minus, ExternalLink, Eye } from 'lucide-react'
 import { formatPrice } from '../lib/calculations'
 import { ProductImage } from './ui/ProductImage'
 import type { OfferProduct } from '../types'
@@ -67,6 +68,14 @@ export function ProductModal({
             <ExternalLink className="h-4 w-4" strokeWidth={1.5} />
           </a>
         )}
+        <Link
+          to={`/showcase?product=${product.id}`}
+          target="_blank"
+          className="mt-2 inline-flex items-center gap-1 text-sm text-muted transition hover:text-foreground"
+        >
+          <Eye className="h-4 w-4" strokeWidth={1.5} />
+          Visa kund
+        </Link>
 
         <div className="mt-8 flex flex-wrap items-center gap-6 border-t border-white/30 pt-6">
           <div className="flex items-center gap-3">
