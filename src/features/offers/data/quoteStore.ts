@@ -1,6 +1,7 @@
 import type { OfferQuote } from '../types'
 
 const DRAFT_KEY = 'ilva-offer-draft'
+const HISTORY_KEY = 'ilva-offer-history'
 const QUOTE_COUNTER_KEY = 'ilva-offer-counter'
 
 export function loadDraft(): OfferQuote | null {
@@ -27,5 +28,35 @@ export function nextQuoteNumber(): string {
   const raw = localStorage.getItem(QUOTE_COUNTER_KEY) ?? '0'
   const next = parseInt(raw, 10) + 1
   localStorage.setItem(QUOTE_COUNTER_KEY, String(next))
-  return `DEMO-${year}-${String(next).padStart(4, '0')}`
+  return `ILVA-HAL-${year}-${String(next).padStart(4, '0')}`
+}
+
+export function loadHistory(): OfferQuote[] {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY)
+    return raw ? (JSON.parse(raw) as OfferQuote[]) : []
+  } catch {
+    return []
+  }
+}
+
+export function addToHistory(quote: OfferQuote) {
+  try {
+    const existing = loadHistory()
+    const filtered = existing.filter((q) => q.id !== quote.id)
+    const next = [quote, ...filtered].slice(0, 100)
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(next))
+  } catch {}
+}
+
+export function deleteFromHistory(id: string) {
+  try {
+    const existing = loadHistory()
+    const next = existing.filter((q) => q.id !== id)
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(next))
+  } catch {}
+}
+
+export function clearHistory() {
+  localStorage.removeItem(HISTORY_KEY)
 }

@@ -1,7 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { CustomerInfo, DiscountMode, OfferProduct, OfferQuote, OfferQuoteItem } from '../types'
 import { calculateQuoteTotals, validateDiscount } from '../lib/calculations'
-import { clearDraft, loadDraft, nextQuoteNumber, saveDraft } from '../data/quoteStore'
+import {
+  addToHistory,
+  clearDraft,
+  deleteFromHistory,
+  loadDraft,
+  loadHistory,
+  nextQuoteNumber,
+  saveDraft,
+} from '../data/quoteStore'
 
 const emptyCustomer: CustomerInfo = {
   name: '',
@@ -15,7 +23,7 @@ const emptyCustomer: CustomerInfo = {
 
 function createEmptyQuote(): OfferQuote {
   return {
-    id: `q-${Date.now()}`,
+    id: `q-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
     quoteNumber: nextQuoteNumber(),
     createdAt: new Date().toISOString(),
     validDays: 30,
@@ -32,10 +40,23 @@ function createEmptyQuote(): OfferQuote {
 
 export function useQuote() {
   const [quote, setQuote] = useState<OfferQuote>(() => loadDraft() ?? createEmptyQuote())
+  const [history, setHistory] = useState<OfferQuote[]>(() => loadHistory())
 
   useEffect(() => {
     saveDraft(quote)
   }, [quote])
+
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'ilva-offer-history' && e.newValue) {
+        setHistory(JSON.parse(e.newValue) as OfferQuote[])
+      }
+    }
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
+  }, [])
+
+  const refreshHistory = useCallback(() => setHistory(loadHistory()), [])
 
   const addProduct = useCallback((product: OfferProduct, addQuantity = 1) => {
     setQuote((q) => {
@@ -94,6 +115,25 @@ export function useQuote() {
     setQuote((q) => ({ ...q, customerNote, internalNote }))
   }, [])
 
+  const saveToHistory = useCallback(() => {
+    const withTotal = { ...quote, status: 'ready' as const, createdAt: new Date().toISOString() }
+    addToHistory(withTotal)
+    setHistory((prev) => [withTotal, ...prev.filter((h) => h.id !== quote.id)].slice(0, 100))
+  }, [quote])
+
+  const removeFromHistory = useCallback(
+    (id: string) => {
+      deleteFromHistory(id)
+      refreshHistory()
+    },
+    [refreshHistory]
+  )
+
+  const loadFromHistory = useCallback((q: OfferQuote) => {
+    setQuote(q)
+    saveDraft(q)
+  }, [])
+
   const resetQuote = useCallback(() => {
     clearDraft()
     setQuote(createEmptyQuote())
@@ -104,6 +144,7 @@ export function useQuote() {
   return {
     quote,
     totals,
+    history,
     addProduct,
     removeItem,
     updateQuantity,
@@ -111,6 +152,9 @@ export function useQuote() {
     updateGlobalDiscount,
     updateCustomer,
     updateNotes,
+    saveToHistory,
+    removeFromHistory,
+    loadFromHistory,
     resetQuote,
   }
 }
