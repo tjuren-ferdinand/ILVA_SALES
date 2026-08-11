@@ -83,8 +83,12 @@ export type ProductSearchResult = {
   error?: string
 }
 
+export type ProductSearchOptions = {
+  signal?: AbortSignal
+}
+
 export interface ProductProvider {
   name: string
-  search(query: string): Promise<ProductSearchResult>
+  search(query: string, options?: ProductSearchOptions): Promise<ProductSearchResult>
   getProduct?(id: string): Promise<OfferProduct | null>
 }
