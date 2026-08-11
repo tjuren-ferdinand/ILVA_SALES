@@ -9,7 +9,8 @@ export const productProviders: Record<string, ProductProvider> = {
   manual: manualProductProvider,
 }
 
-export const DEFAULT_PROVIDER: ProductProvider = demoProductProvider
+export const DEFAULT_PROVIDER: ProductProvider =
+  import.meta.env?.VITE_USE_DEMO_PROVIDER === 'true' ? demoProductProvider : ilvaProductProvider
 
 export function getProvider(name: string): ProductProvider {
   return productProviders[name] ?? demoProductProvider

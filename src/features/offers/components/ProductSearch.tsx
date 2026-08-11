@@ -22,7 +22,7 @@ export function ProductSearch({
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Sök produkter</h2>
-          <p className="text-sm text-muted">Demo-katalog · 21 produkter</p>
+          <p className="text-sm text-muted">Sök ILVA.se</p>
         </div>
         <button
           onClick={() => openIlvaSearch()}
@@ -57,7 +57,7 @@ export function ProductSearch({
 
       {query && !searching && results.length === 0 && !error && (
         <div className="mt-4 rounded-2xl border border-amber-200/50 bg-amber-50/60 p-4 text-sm text-amber-800">
-          <p>Inga träffar i demo-katalogen.</p>
+          <p>Inga träffar på ILVA.se.</p>
           <div className="mt-2 flex flex-wrap gap-3">
             <button
               onClick={() => openIlvaSearch()}

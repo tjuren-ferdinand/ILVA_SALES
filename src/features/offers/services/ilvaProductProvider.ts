@@ -1,20 +1,37 @@
-import type { ProductProvider, ProductSearchResult } from '../types'
+import type { ProductProvider, ProductSearchResult, OfferProduct } from '../types'
+
+const API_BASE = '/api/ilva'
+
+async function apiSearch(query: string): Promise<OfferProduct[]> {
+  const url = `${API_BASE}/search?q=${encodeURIComponent(query)}&limit=10`
+  const res = await fetch(url)
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ error: 'Kunde inte hämta produkter från ILVA just nu.' }))
+    throw new Error(body.error ?? `ILVA API ${res.status}`)
+  }
+  const data = await res.json()
+  return data.products ?? []
+}
 
 export const ilvaProductProvider: ProductProvider = {
   name: 'ilva',
-  async search(_query: string): Promise<ProductSearchResult> {
-    // NOTE: This provider is a placeholder for an approved ILVA product integration.
-    // No public, stable ILVA JSON/API endpoint has been identified so far.
-    // This stub returns an empty result with a clear message so the UI can
-    // guide the salesperson to use the Demo or Manual provider instead.
-    return {
-      products: [],
-      source: 'ilva',
-      error:
-        'Riktig ILVA-integration är inte tillgänglig i denna version. Använd demo-produkter eller lägg till en produkt manuellt.',
+  async search(query: string): Promise<ProductSearchResult> {
+    try {
+      const products = await apiSearch(query)
+      return { products, source: 'ilva' }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Okänt fel'
+      return {
+        products: [],
+        source: 'ilva',
+        error:
+          message === 'Kunde inte hämta produkter från ILVA just nu.'
+            ? 'Kunde inte hämta produkter från ILVA just nu. Försök igen.'
+            : message,
+      }
     }
   },
-  async getProduct(): Promise<null> {
+  async getProduct(): Promise<OfferProduct | null> {
     return null
   },
 }
