@@ -32,7 +32,7 @@ export function PinGuard({
   title?: string
   description?: string
 }) {
-  const [pins, setPins] = useState<string[]>([])
+  const [pins, setPins] = useState<string[]>(() => loadPins())
   const [unlocked, setUnlocked] = useState(false)
   const [pin, setPin] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -40,8 +40,6 @@ export function PinGuard({
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    setPins(loadPins())
-    setUnlocked(false)
     inputRef.current?.focus()
   }, [])
 

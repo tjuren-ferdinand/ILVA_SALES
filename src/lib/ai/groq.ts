@@ -71,7 +71,7 @@ export async function sendChatMessage(messages: ChatMessage[]): Promise<string> 
   } catch (error) {
     clearTimeout(timeout)
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Förfrågan tog för lång tid. Försök igen.')
+      throw new Error('Förfrågan tog för lång tid. Försök igen.', { cause: error })
     }
     throw error
   }

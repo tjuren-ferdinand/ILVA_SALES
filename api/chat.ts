@@ -2,13 +2,25 @@ import { createGroqReply } from '../src/server/groqChat'
 
 const DEFAULT_MODEL = 'llama-3.1-8b-instant'
 
-export default async function handler(req: any, res: any) {
+type ChatRequest = {
+  method?: string
+  body?: {
+    messages?: unknown
+    model?: string
+  }
+}
+
+type ChatResponse = {
+  status: (code: number) => { json: (body: unknown) => void }
+}
+
+export default async function handler(req: ChatRequest, res: ChatResponse) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' })
     return
   }
 
-  const { messages, model } = (req.body as { messages?: unknown; model?: string }) ?? {}
+  const { messages, model } = req.body ?? {}
 
   const apiKey = process.env.GROQ_API_KEY
   if (!apiKey) {

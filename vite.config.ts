@@ -1,10 +1,11 @@
+import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Connect } from 'vite'
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { searchIlvaProducts, fetchIlvaProduct } from './src/server/ilvaScraper.ts'
 import { createGroqReply } from './src/server/groqChat.ts'
 
-function sendJson(res: any, status: number, data: unknown) {
+function sendJson(res: ServerResponse, status: number, data: unknown) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' })
   res.end(JSON.stringify(data))
 }
@@ -18,7 +19,7 @@ function parseQuery(url: string): Record<string, string> {
   return params
 }
 
-function readBody(req: any): Promise<unknown> {
+function readBody(req: IncomingMessage): Promise<unknown> {
   return new Promise((resolve) => {
     const chunks: Buffer[] = []
     req.on('data', (chunk: Buffer) => chunks.push(chunk))
@@ -46,7 +47,7 @@ export default defineConfig(({ mode }) => {
       {
         name: 'ilva-api',
         configureServer(server) {
-          server.middlewares.use('/api/ilva/search' as any, (async (req, res) => {
+          server.middlewares.use('/api/ilva/search', (async (req, res) => {
             try {
               const params = parseQuery(req.url ?? '')
               const q = params.q ?? ''
@@ -63,7 +64,7 @@ export default defineConfig(({ mode }) => {
             }
           }) as Connect.NextHandleFunction)
 
-          server.middlewares.use('/api/ilva/product' as any, (async (req, res) => {
+          server.middlewares.use('/api/ilva/product', (async (req, res) => {
             try {
               const params = parseQuery(req.url ?? '')
               const url = params.url ?? ''
@@ -79,7 +80,7 @@ export default defineConfig(({ mode }) => {
             }
           }) as Connect.NextHandleFunction)
 
-          server.middlewares.use('/api/chat' as any, (async (req, res) => {
+          server.middlewares.use('/api/chat', (async (req, res) => {
             if (req.method !== 'POST') {
               sendJson(res, 405, { error: 'Method not allowed' })
               return
