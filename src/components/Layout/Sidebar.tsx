@@ -12,7 +12,7 @@ export function Sidebar({
 }) {
   return (
     <>
-      <aside className="fixed left-8 top-4 z-30 hidden h-[calc(100vh-2rem)] w-48 flex-col md:flex">
+      <aside className="fixed left-8 top-4 z-30 hidden h-[calc(100vh-2rem)] w-40 flex-col md:flex">
         <div className="mb-8 select-none">
           <div className="text-2xl font-semibold tracking-tight text-foreground">ILVA</div>
           <div className="text-sm font-medium text-muted">Sales Hub</div>
@@ -80,7 +80,7 @@ function NavItem({
       to={item.path}
       onClick={onClick}
       className={({ isActive }) =>
-        `flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+        `flex items-center gap-2 rounded-2xl px-2.5 py-2 text-xs font-medium transition-all duration-200 ${
           isActive
             ? 'bg-white/80 text-foreground shadow-card'
             : 'text-muted hover:text-foreground'
