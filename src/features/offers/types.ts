@@ -9,6 +9,9 @@ export type OfferProduct = {
   image?: string
   url?: string
   description?: string
+  brand?: string
+  series?: string
+  source: 'demo' | 'ilva' | 'manual'
 }
 
 export type OfferQuoteItem = {
@@ -42,11 +45,14 @@ export type GlobalDiscount = {
   value: number
 }
 
+export type QuoteStatus = 'draft' | 'ready' | 'sent'
+
 export type OfferQuote = {
   id: string
   quoteNumber: string
   createdAt: string
   validDays: number
+  status: QuoteStatus
   customer: CustomerInfo
   salesperson: Salesperson
   store: StoreInfo
@@ -54,6 +60,10 @@ export type OfferQuote = {
   globalDiscount: GlobalDiscount
   customerNote: string
   internalNote: string
+}
+
+export type QuoteHistory = Pick<OfferQuote, 'id' | 'quoteNumber' | 'createdAt' | 'status' | 'customer' | 'items'> & {
+  total: number
 }
 
 export type QuoteTotals = {
@@ -69,6 +79,12 @@ export type QuoteTotals = {
 
 export type ProductSearchResult = {
   products: OfferProduct[]
-  source: 'mock' | 'ilva'
+  source: 'demo' | 'ilva' | 'manual'
   error?: string
+}
+
+export interface ProductProvider {
+  name: string
+  search(query: string): Promise<ProductSearchResult>
+  getProduct?(id: string): Promise<OfferProduct | null>
 }

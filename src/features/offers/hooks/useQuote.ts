@@ -19,6 +19,7 @@ function createEmptyQuote(): OfferQuote {
     quoteNumber: nextQuoteNumber(),
     createdAt: new Date().toISOString(),
     validDays: 30,
+    status: 'draft',
     customer: emptyCustomer,
     salesperson: { name: 'Demo Säljare' },
     store: { name: 'ILVA Halmstad' },
