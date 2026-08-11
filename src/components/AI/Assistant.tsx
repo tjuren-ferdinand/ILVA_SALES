@@ -1,0 +1,130 @@
+import { useEffect, useRef, useState } from 'react'
+import { Sparkles, Send, X, MessageSquare, AlertCircle } from 'lucide-react'
+import { sendChatMessage, type ChatMessage } from '../../lib/ai/groq'
+
+export function Assistant() {
+  const [open, setOpen] = useState(false)
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      role: 'assistant',
+      content: 'Hej! Jag är din ILVA Säljassistent. Ställ en fråga om leverans, rabatt eller en produkt.',
+    },
+  ])
+  const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const endRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (open) {
+      endRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messages, open])
+
+  const handleSend = async () => {
+    const text = input.trim()
+    if (!text || loading) return
+
+    const userMessage: ChatMessage = { role: 'user', content: text }
+    const nextMessages = [...messages, userMessage]
+    setMessages(nextMessages)
+    setInput('')
+    setError(null)
+    setLoading(true)
+
+    try {
+      const answer = await sendChatMessage(nextMessages)
+      setMessages([...nextMessages, { role: 'assistant', content: answer }])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Något gick fel.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
+  }
+
+  return (
+    <>
+      {!open && (
+        <button
+          onClick={() => setOpen(true)}
+          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-foreground text-surface shadow-2xl transition hover:scale-105 hover:shadow-card"
+          aria-label="Öppna säljassistent"
+        >
+          <Sparkles className="h-5 w-5" strokeWidth={1.5} />
+        </button>
+      )}
+
+      {open && (
+        <div className="fixed bottom-4 right-4 left-4 z-50 flex flex-col rounded-[2rem] border border-white/50 bg-white/85 p-4 shadow-2xl backdrop-blur-2xl md:bottom-6 md:right-6 md:left-auto md:h-[32rem] md:w-[26rem]">
+          <div className="flex items-center justify-between pb-3">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-surface">
+                <MessageSquare className="h-4 w-4" strokeWidth={1.5} />
+              </div>
+              <span className="font-semibold text-foreground">ILVA Säljassistent</span>
+            </div>
+            <button
+              onClick={() => setOpen(false)}
+              className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-foreground/5"
+              aria-label="Stäng"
+            >
+              <X className="h-4 w-4 text-muted" strokeWidth={1.5} />
+            </button>
+          </div>
+
+          <div className="flex-1 space-y-4 overflow-y-auto px-1 py-2">
+            {messages.map((m, i) => (
+              <div
+                key={i}
+                className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                  m.role === 'user'
+                    ? 'ml-auto bg-foreground text-surface'
+                    : 'bg-background text-foreground'
+                }`}
+              >
+                {m.content}
+              </div>
+            ))}
+            {loading && (
+              <div className="w-fit rounded-2xl bg-background px-4 py-3 text-sm text-muted">
+                Tänker…
+              </div>
+            )}
+            {error && (
+              <div className="flex items-start gap-2 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} />
+                {error}
+              </div>
+            )}
+            <div ref={endRef} />
+          </div>
+
+          <div className="mt-3 flex items-center gap-2 rounded-2xl border border-border bg-background p-2">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Fråga om leverans, rabatt, produkt…"
+              className="flex-1 bg-transparent px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted"
+            />
+            <button
+              onClick={handleSend}
+              disabled={!input.trim() || loading}
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-foreground text-surface transition hover:bg-black disabled:opacity-40"
+              aria-label="Skicka"
+            >
+              <Send className="h-4 w-4" strokeWidth={1.5} />
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}

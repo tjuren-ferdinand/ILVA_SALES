@@ -1,0 +1,6 @@
+[
+  { "id": "1", "name": "Johanna", "role": "Platschef ILVA Halmstad", "image": "/team/photo-1.jpg" },
+  { "id": "2", "name": "Ida", "role": "Biträdande chef", "image": "/team/photo-2.jpg" },
+  { "id": "3", "name": "Anställd 3", "role": "Säljare", "image": "/team/photo-3.jpg" },
+  { "id": "4", "name": "Anställd 4", "role": "Säljare", "image": "/team/photo-4.jpg" }
+]
