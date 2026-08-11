@@ -1,10 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { useQuote } from '../hooks/useQuote'
-import { searchProducts } from '../services/productSearch'
 import { calculateCustomerUnitPrice, formatPrice } from '../lib/calculations'
 import type { OfferProduct } from '../types'
-
 import { ProductSearch } from '../components/ProductSearch'
 import { ProductModal } from '../components/ProductModal'
 import { EmptyQuote } from '../components/EmptyQuote'
@@ -30,28 +28,9 @@ export function OfferPage() {
     resetQuote,
   } = useQuote()
 
-  const [query, setQuery] = useState('')
-  const [searching, setSearching] = useState(false)
-  const [results, setResults] = useState<OfferProduct[]>([])
   const [selectedProduct, setSelectedProduct] = useState<OfferProduct | null>(null)
   const [view, setView] = useState<'workspace' | 'preview'>('workspace')
   const [copied, setCopied] = useState(false)
-
-  const handleSearch = useCallback(async () => {
-    setSearching(true)
-    const res = await searchProducts(query)
-    setResults(res.products)
-    setSearching(false)
-  }, [query])
-
-  useEffect(() => {
-    if (query.trim() === '') {
-      setResults([])
-      return
-    }
-    const t = setTimeout(() => handleSearch(), 250)
-    return () => clearTimeout(t)
-  }, [query, handleSearch])
 
   const handleCopy = () => {
     const summary = quote.items
@@ -82,14 +61,7 @@ export function OfferPage() {
 
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="space-y-5 lg:col-span-2">
-              <ProductSearch
-                query={query}
-                setQuery={setQuery}
-                searching={searching}
-                results={results}
-                onSelect={setSelectedProduct}
-                onAdd={addProduct}
-              />
+              <ProductSearch onSelect={setSelectedProduct} onAdd={addProduct} />
               {quote.items.length === 0 ? (
                 <EmptyQuote onSearch={() => document.getElementById('offer-search')?.focus()} />
               ) : (

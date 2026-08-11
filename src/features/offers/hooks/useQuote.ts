@@ -37,21 +37,21 @@ export function useQuote() {
     saveDraft(quote)
   }, [quote])
 
-  const addProduct = useCallback((product: OfferProduct) => {
+  const addProduct = useCallback((product: OfferProduct, addQuantity = 1) => {
     setQuote((q) => {
       const existing = q.items.find((i) => i.product.id === product.id)
       if (existing) {
         return {
           ...q,
           items: q.items.map((i) =>
-            i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
+            i.product.id === product.id ? { ...i, quantity: i.quantity + addQuantity } : i
           ),
         }
       }
       const item: OfferQuoteItem = {
-        id: `qi-${Date.now()}`,
+        id: `qi-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
         product,
-        quantity: 1,
+        quantity: Math.max(1, addQuantity),
         discountMode: 'percent',
         discountValue: 0,
       }
