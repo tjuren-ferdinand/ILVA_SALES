@@ -18,6 +18,7 @@ import { Favorites } from './pages/Favorites'
 import { Settings } from './pages/Settings'
 import { Showcase } from './pages/Showcase'
 import { Team } from './pages/Team'
+import { OfferPage } from './features/offers/pages/OfferPage'
 import { NotFound } from './pages/NotFound'
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/showcase" element={<Showcase />} />
         <Route path="/team" element={<Team />} />
+        <Route path="/offert" element={<OfferPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AppShell>

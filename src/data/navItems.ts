@@ -15,6 +15,7 @@ import {
   Settings,
   Users,
   Image,
+  FileText,
 } from 'lucide-react'
 
 export type NavItem = {
@@ -25,6 +26,7 @@ export type NavItem = {
 
 export const topNav: NavItem[] = [
   { label: 'Hem', path: '/', icon: Home },
+  { label: 'Offert', path: '/offert', icon: FileText },
   { label: 'Sök', path: '/search', icon: Search },
   { label: 'Leverans', path: '/delivery', icon: Truck },
   { label: 'Koder', path: '/codes', icon: FileCode },
