@@ -20,7 +20,7 @@ function initials(name: string) {
 function Avatar({ image, name }: { image?: string; name: string }) {
   const [showImage, setShowImage] = useState(!!image)
   return (
-    <div className="h-24 w-24 overflow-hidden rounded-full border-2 border-white/60 bg-background shadow-card">
+    <div className="h-28 w-28 overflow-hidden rounded-full border-4 border-white/70 bg-background shadow-soft ring-2 ring-white/40">
       {showImage && image ? (
         <img
           src={image}
@@ -54,7 +54,7 @@ export function Team() {
     <div className="space-y-6">
       <PageHeader
         title="Team"
-        description="Profilbilder och kontakt för alla kollegor. Lägg bilderna i mappen /public/team/ som photo-1.jpg, photo-2.jpg osv."
+        description="Profilbilder och kontakt för alla kollegor på ILVA Halmstad."
       />
 
       {loading ? (

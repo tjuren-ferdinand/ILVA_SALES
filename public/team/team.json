@@ -1,6 +1,9 @@
 [
-  { "id": "1", "name": "Johanna", "role": "Platschef ILVA Halmstad", "image": "/team/photo-1.jpg" },
-  { "id": "2", "name": "Ida", "role": "Biträdande chef", "image": "/team/photo-2.jpg" },
-  { "id": "3", "name": "Anställd 3", "role": "Säljare", "image": "/team/photo-3.jpg" },
-  { "id": "4", "name": "Anställd 4", "role": "Säljare", "image": "/team/photo-4.jpg" }
+  { "id": "1", "name": "Johanna", "role": "Platschef ILVA Halmstad", "image": "/team/johanna.jpeg" },
+  { "id": "2", "name": "Ida", "role": "Biträdande chef", "image": "/team/ida.jpeg" },
+  { "id": "3", "name": "Isak", "role": "Säljare", "image": "/team/isak.jpeg" },
+  { "id": "4", "name": "Karin", "role": "Säljare", "image": "/team/karin.jpeg" },
+  { "id": "5", "name": "Marielle", "role": "Säljare", "image": "/team/marielle.jpeg" },
+  { "id": "6", "name": "Nellie", "role": "Säljare", "image": "/team/nellie.jpeg" },
+  { "id": "7", "name": "Simon", "role": "Säljare", "image": "/team/simon.jpeg" }
 ]
