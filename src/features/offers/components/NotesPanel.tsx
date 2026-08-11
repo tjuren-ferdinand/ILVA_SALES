@@ -1,4 +1,4 @@
-import { AlertCircle } from 'lucide-react'
+import { MessageSquare, Lock } from 'lucide-react'
 
 export function NotesPanel({
   customerNote,
@@ -14,7 +14,10 @@ export function NotesPanel({
       <h2 className="text-lg font-semibold text-foreground">Anteckningar</h2>
       <div className="mt-4 space-y-4">
         <div>
-          <label className="block text-xs font-medium text-muted">Kommentar till kund</label>
+          <label className="flex items-center gap-2 text-xs font-medium text-muted">
+            <MessageSquare className="h-3.5 w-3.5" strokeWidth={1.5} />
+            Kommentar till kund
+          </label>
           <textarea
             value={customerNote}
             onChange={(e) => onChange(e.target.value, internalNote)}
@@ -23,7 +26,7 @@ export function NotesPanel({
         </div>
         <div>
           <label className="flex items-center gap-2 text-xs font-medium text-muted">
-            <AlertCircle className="h-3.5 w-3.5" strokeWidth={1.5} />
+            <Lock className="h-3.5 w-3.5" strokeWidth={1.5} />
             Intern anteckning (visas ej för kund)
           </label>
           <textarea

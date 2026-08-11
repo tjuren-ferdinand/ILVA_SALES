@@ -1,4 +1,4 @@
-import { FileText, Printer, Copy, RotateCcw } from 'lucide-react'
+import { Eye, Copy, Printer, RotateCcw } from 'lucide-react'
 
 export function ActionsPanel({
   onPreview,
@@ -20,7 +20,7 @@ export function ActionsPanel({
           onClick={onPreview}
           className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/40 bg-white/40 px-4 py-3 text-sm font-medium text-foreground backdrop-blur-xl transition hover:bg-white/60"
         >
-          <FileText className="h-4 w-4" strokeWidth={1.5} />
+          <Eye className="h-4 w-4" strokeWidth={1.5} />
           Förhandsvisa
         </button>
         <button
@@ -45,7 +45,7 @@ export function ActionsPanel({
           Ny offert
         </button>
       </div>
-      <p className="mt-3 text-center text-xs text-muted">Offerten sparas automatiskt lokalt.</p>
+      <p className="mt-3 text-center text-xs text-muted">Utkastet sparas automatiskt.</p>
     </div>
   )
 }

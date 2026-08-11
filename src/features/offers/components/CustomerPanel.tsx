@@ -1,4 +1,4 @@
-import { User, Building, Phone, Mail, MapPin } from 'lucide-react'
+import { User, Building2, Phone, Mail, MapPin } from 'lucide-react'
 import type { CustomerInfo } from '../types'
 
 export function CustomerPanel({
@@ -12,19 +12,19 @@ export function CustomerPanel({
     <div className="surface p-5 md:p-6">
       <h2 className="text-lg font-semibold text-foreground">Kunduppgifter</h2>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <LabeledInput icon={User} label="Namn" value={customer.name} onChange={(v) => onChange({ name: v })} />
-        <LabeledInput icon={Building} label="Företag" value={customer.company} onChange={(v) => onChange({ company: v })} />
-        <LabeledInput icon={Phone} label="Telefon" value={customer.phone} onChange={(v) => onChange({ phone: v })} />
-        <LabeledInput icon={Mail} label="E-post" value={customer.email} onChange={(v) => onChange({ email: v })} />
-        <LabeledInput icon={MapPin} label="Adress" value={customer.address} onChange={(v) => onChange({ address: v })} className="sm:col-span-2" />
-        <LabeledInput icon={MapPin} label="Postnummer" value={customer.postalCode} onChange={(v) => onChange({ postalCode: v })} />
-        <LabeledInput icon={MapPin} label="Ort" value={customer.city} onChange={(v) => onChange({ city: v })} />
+        <Field icon={User} label="Namn" value={customer.name} onChange={(v) => onChange({ name: v })} />
+        <Field icon={Building2} label="Företag" value={customer.company} onChange={(v) => onChange({ company: v })} />
+        <Field icon={Phone} label="Telefon" value={customer.phone} onChange={(v) => onChange({ phone: v })} />
+        <Field icon={Mail} label="E-post" value={customer.email} onChange={(v) => onChange({ email: v })} />
+        <Field icon={MapPin} label="Adress" value={customer.address} onChange={(v) => onChange({ address: v })} className="sm:col-span-2" />
+        <Field icon={MapPin} label="Postnummer" value={customer.postalCode} onChange={(v) => onChange({ postalCode: v })} />
+        <Field icon={MapPin} label="Ort" value={customer.city} onChange={(v) => onChange({ city: v })} />
       </div>
     </div>
   )
 }
 
-function LabeledInput({
+function Field({
   icon: Icon,
   label,
   value,

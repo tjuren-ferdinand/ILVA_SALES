@@ -11,6 +11,7 @@ import { QuoteSummaryPanel } from '../components/QuoteSummaryPanel'
 import { CustomerPanel } from '../components/CustomerPanel'
 import { NotesPanel } from '../components/NotesPanel'
 import { ActionsPanel } from '../components/ActionsPanel'
+import { QuoteMetadata } from '../components/QuoteMetadata'
 import { PreviewScreen } from '../components/PreviewScreen'
 import { QuotePreview } from '../components/QuotePreview'
 
@@ -75,6 +76,7 @@ export function OfferPage() {
             </div>
 
             <div className="space-y-5">
+              <QuoteMetadata quote={quote} />
               <QuoteSummaryPanel
                 quote={quote}
                 totals={totals}
