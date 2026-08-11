@@ -42,31 +42,17 @@ Vägledning:
 - Ge inte långa resonemang – svara med det säljaren behöver veta.`
 
 export async function sendChatMessage(messages: ChatMessage[]): Promise<string> {
-  const apiKey = import.meta.env.VITE_GROQ_API_KEY as string | undefined
-  const model = 'llama-3.1-8b-instant'
-
-  if (!apiKey) {
-    throw new Error('Saknar VITE_GROQ_API_KEY. Lägg till nyckeln i .env.local.')
-  }
-
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 25000)
+  const timeout = setTimeout(() => controller.abort(), 30000)
 
   try {
-    const response = await fetch('/api/v1/chat/completions', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages,
-        ],
-        temperature: 0.4,
-        max_tokens: 900,
+        messages: [{ role: 'system', content: systemPrompt }, ...messages],
       }),
       signal: controller.signal,
     })
@@ -74,15 +60,14 @@ export async function sendChatMessage(messages: ChatMessage[]): Promise<string> 
     clearTimeout(timeout)
 
     if (!response.ok) {
-      const err = await response.text()
-      throw new Error(`Groq ${response.status}: ${err}`)
+      const data = await response.json().catch(() => ({ error: `HTTP ${response.status}` }))
+      throw new Error(data.error ?? `Fel från servern (${response.status})`)
     }
 
-    const data = (await response.json()) as {
-      choices?: { message?: { content?: string } }[]
-    }
+    const data = (await response.json()) as { reply?: string; error?: string }
 
-    return data.choices?.[0]?.message?.content?.trim() || 'Jag har inget svar just nu.'
+    if (data.error) throw new Error(data.error)
+    return data.reply?.trim() || 'Jag har inget svar just nu.'
   } catch (error) {
     clearTimeout(timeout)
     if (error instanceof Error && error.name === 'AbortError') {
