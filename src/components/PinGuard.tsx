@@ -87,7 +87,7 @@ export function PinGuard({
       >
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-[16rem] space-y-3 rounded-[2rem] border border-white/30 bg-white/50 p-5 shadow-soft backdrop-blur-2xl"
+          className="w-full max-w-72 space-y-3 rounded-[2rem] border border-white/30 bg-white/50 p-5 shadow-soft backdrop-blur-2xl"
         >
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/40 text-foreground">
@@ -113,14 +113,14 @@ export function PinGuard({
                 setError(null)
               }}
               placeholder="----"
-              className="h-11 flex-1 rounded-2xl border border-border bg-background text-center text-lg tracking-[0.4em] text-foreground outline-none transition focus:border-foreground/30"
+              className="h-10 min-w-0 flex-1 rounded-2xl border border-border bg-background text-center text-lg tracking-[0.2em] text-foreground outline-none transition focus:border-foreground/30"
               aria-label="4-siffrig PIN-kod"
               autoFocus
             />
             <button
               type="submit"
               disabled={pin.length !== 4}
-              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-foreground text-surface transition hover:bg-foreground/90 disabled:opacity-40"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-foreground text-surface transition hover:bg-foreground/90 disabled:opacity-40"
               aria-label="Lås upp"
             >
               <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
