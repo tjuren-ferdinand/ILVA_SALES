@@ -167,7 +167,7 @@ export function Home() {
         )}
       </section>
 
-      <PinGuard>
+      <PinGuard title="Maxrabatter" description="Ange din 4-siffriga kod." position="bottom">
         <section className="surface p-6 md:p-8">
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>

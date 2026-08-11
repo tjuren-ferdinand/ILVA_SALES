@@ -25,12 +25,14 @@ function savePins(pins: string[]) {
 
 export function PinGuard({
   children,
-  title = 'Maxrabatter',
-  description = 'Ange din personliga 4-siffriga PIN-kod för att se rabatterna.',
+  title = 'Låst innehåll',
+  description = 'Ange din 4-siffriga PIN-kod.',
+  position = 'center',
 }: {
   children: React.ReactNode
   title?: string
   description?: string
+  position?: 'bottom' | 'center'
 }) {
   const [pins, setPins] = useState<string[]>(() => loadPins())
   const [unlocked, setUnlocked] = useState(false)
@@ -46,7 +48,7 @@ export function PinGuard({
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault()
     if (!/^\d{4}$/.test(pin)) {
-      setError('Ange exakt 4 siffror.')
+      setError('4 siffror')
       return
     }
 
@@ -55,7 +57,7 @@ export function PinGuard({
       savePins(first)
       setPins(first)
       setUnlocked(true)
-      setHint('Din PIN-kod har sparats på denna enhet.')
+      setHint('PIN sparad.')
       return
     }
 
@@ -64,7 +66,7 @@ export function PinGuard({
       setError(null)
       setHint(null)
     } else {
-      setError('Fel PIN-kod.')
+      setError('Fel PIN')
       setPin('')
       inputRef.current?.focus()
     }
@@ -76,22 +78,28 @@ export function PinGuard({
 
   return (
     <div className="relative">
-      <div className="blur-[2px] select-none opacity-40">{children}</div>
+      <div className="select-none blur-[1px] opacity-30">{children}</div>
 
-      <div className="absolute inset-0 z-10 flex items-center justify-center rounded-3xl">
+      <div
+        className={`absolute inset-0 z-10 flex ${
+          position === 'bottom' ? 'items-end justify-center pb-6' : 'items-center justify-center'
+        } bg-foreground/[0.03] backdrop-blur-sm`}
+      >
         <form
           onSubmit={handleSubmit}
-          className="surface w-full max-w-sm space-y-5 rounded-[2rem] border border-white/40 p-6 shadow-2xl backdrop-blur-2xl md:p-8"
+          className="w-full max-w-[16rem] space-y-3 rounded-[2rem] border border-white/30 bg-white/50 p-5 shadow-soft backdrop-blur-2xl"
         >
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100/50 text-amber-700">
-            <Lock className="h-6 w-6" strokeWidth={1.5} />
-          </div>
-          <div className="text-center">
-            <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-            <p className="mt-1 text-sm text-muted">{description}</p>
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/40 text-foreground">
+              <Lock className="h-4 w-4" strokeWidth={1.5} />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+              <p className="text-xs text-muted">{description}</p>
+            </div>
           </div>
 
-          <div className="relative mx-auto w-fit">
+          <div className="flex gap-2">
             <input
               ref={inputRef}
               type="password"
@@ -104,34 +112,29 @@ export function PinGuard({
                 setPin(v)
                 setError(null)
               }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSubmit()
-              }}
-              className="h-14 w-44 rounded-2xl border border-border bg-background text-center text-2xl tracking-[0.5em] text-foreground outline-none transition focus:border-foreground/30"
+              placeholder="----"
+              className="h-11 flex-1 rounded-2xl border border-border bg-background text-center text-lg tracking-[0.4em] text-foreground outline-none transition focus:border-foreground/30"
               aria-label="4-siffrig PIN-kod"
               autoFocus
             />
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center gap-4 opacity-0" />
+            <button
+              type="submit"
+              disabled={pin.length !== 4}
+              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-foreground text-surface transition hover:bg-foreground/90 disabled:opacity-40"
+              aria-label="Lås upp"
+            >
+              <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
+            </button>
           </div>
 
-          {hint && (
-            <p className="text-center text-xs text-amber-700">{hint}</p>
-          )}
-          {error && (
-            <p className="text-center text-xs text-red-600">{error}</p>
+          {(hint || error) && (
+            <p className={`text-center text-xs ${error ? 'text-red-600' : 'text-amber-700'}`}>
+              {error ?? hint}
+            </p>
           )}
 
-          <button
-            type="submit"
-            disabled={pin.length !== 4}
-            className="mx-auto flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-6 py-3 text-sm font-medium text-surface transition hover:bg-foreground/90 disabled:opacity-40"
-          >
-            Lås upp
-            <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
-          </button>
-
-          <p className="text-center text-xs text-muted">
-            PIN-koder hanteras lokalt på enheten.
+          <p className="text-center text-[10px] leading-relaxed text-muted">
+            PIN-koder sparas lokalt.
           </p>
         </form>
       </div>
