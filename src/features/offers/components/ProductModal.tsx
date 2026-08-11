@@ -69,7 +69,7 @@ export function ProductModal({
           </a>
         )}
         <Link
-          to={`/showcase?product=${product.id}`}
+          to={`/showcase?url=${encodeURIComponent(product.url ?? '')}`}
           target="_blank"
           className="mt-2 inline-flex items-center gap-1 text-sm text-muted transition hover:text-foreground"
         >

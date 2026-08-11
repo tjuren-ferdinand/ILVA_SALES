@@ -118,7 +118,7 @@ function QuoteItemRow({
               </p>
             </div>
             <Link
-              to={`/showcase?product=${item.product.id}`}
+              to={`/showcase?url=${encodeURIComponent(item.product.url ?? '')}`}
               target="_blank"
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted transition hover:bg-white/40 hover:text-foreground"
               aria-label="Visa kund"
