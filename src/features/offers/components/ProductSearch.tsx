@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Search, Package, ExternalLink } from 'lucide-react'
+import { Search, Package, ExternalLink, Plus } from 'lucide-react'
 import { openIlvaSearch } from '../services/productSearch'
 import { formatPrice } from '../lib/calculations'
+import { ManualProductForm } from './ManualProductForm'
 import type { OfferProduct } from '../types'
 
 export function ProductSearch({
@@ -19,6 +20,7 @@ export function ProductSearch({
   onSelect: (p: OfferProduct) => void
   onAdd: (p: OfferProduct) => void
 }) {
+  const [showManual, setShowManual] = useState(false)
   return (
     <div className="surface p-5 md:p-6">
       <h2 className="text-lg font-semibold text-foreground">Sök produkt</h2>
@@ -48,12 +50,32 @@ export function ProductSearch({
 
       {!searching && query && results.length === 0 && (
         <div className="mt-4 rounded-2xl border border-amber-200/50 bg-amber-50/60 p-4 text-sm text-amber-800 backdrop-blur-xl">
-          Inga träffar.{' '}
-          <button onClick={() => openIlvaSearch()} className="underline hover:no-underline">
-            Öppna ILVA.se
-          </button>{' '}
-          eller lägg till produkten manuellt.
+          <p>Inga träffar i demo-produktkatalogen.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              onClick={() => openIlvaSearch()}
+              className="inline-flex items-center gap-1 underline hover:no-underline"
+            >
+              Öppna ILVA.se
+              <ExternalLink className="h-3.5 w-3.5" strokeWidth={1.5} />
+            </button>
+            <button
+              onClick={() => setShowManual(true)}
+              className="inline-flex items-center gap-1 underline hover:no-underline"
+            >
+              <Plus className="h-3.5 w-3.5" strokeWidth={1.5} />
+              Lägg till manuellt
+            </button>
+          </div>
         </div>
+      )}
+
+      {showManual && (
+        <ManualProductForm
+          query={query}
+          onAdd={onAdd}
+          onCancel={() => setShowManual(false)}
+        />
       )}
 
       {results.length > 0 && (
