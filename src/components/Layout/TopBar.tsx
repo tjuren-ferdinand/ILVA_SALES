@@ -1,4 +1,5 @@
 import { GlobalSearch } from '../Search/GlobalSearch'
+import { PilotLabel } from '../Branding/PilotLabel'
 import { Bell, User } from 'lucide-react'
 
 export function TopBar() {
@@ -7,7 +8,8 @@ export function TopBar() {
       <div className="max-w-2xl flex-1">
         <GlobalSearch variant="compact" />
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
+        <PilotLabel />
         <button
           className="relative flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-white/40 text-foreground backdrop-blur-xl transition hover:bg-white/60"
           aria-label="Notiser"

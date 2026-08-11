@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { PageHeader } from '../components/ui/PageHeader'
 import { Badge } from '../components/ui/Badge'
+import { ProductCredit } from '../components/Branding/ProductCredit'
 import {
   deliveryOptions,
   codes,
@@ -137,6 +138,16 @@ export function Settings() {
           className="h-[28rem] w-full rounded-2xl border border-border bg-background p-4 font-mono text-xs text-foreground outline-none focus:border-foreground/30"
           spellCheck={false}
         />
+      </div>
+
+      <div className="surface p-6">
+        <h2 className="text-lg font-semibold text-foreground">Om</h2>
+        <p className="mt-1 text-sm text-muted">
+          ILVA Sales Hub · Pilotbutik Halmstad
+        </p>
+        <div className="mt-4">
+          <ProductCredit />
+        </div>
       </div>
     </div>
   )

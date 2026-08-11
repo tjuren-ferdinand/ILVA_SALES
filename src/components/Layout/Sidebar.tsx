@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { topNav, bottomNav } from '../../data/navItems'
+import { ProductCredit } from '../Branding/ProductCredit'
 
 export function Sidebar({
   mobileOpen,
@@ -26,6 +27,7 @@ export function Sidebar({
             <NavItem key={item.path} item={item} onClick={undefined} />
           ))}
         </nav>
+        <ProductCredit className="mt-8" />
       </aside>
 
       {mobileOpen && (
