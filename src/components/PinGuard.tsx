@@ -1,27 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { Lock, ArrowRight } from 'lucide-react'
 
-const STORAGE_KEY = 'ilva-employee-pins'
-
-function loadPins(): string[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return []
-    const parsed = JSON.parse(raw)
-    if (Array.isArray(parsed)) return parsed.filter((p) => /^\d{4}$/.test(p))
-  } catch {
-    /* ignore */
-  }
-  return []
-}
-
-function savePins(pins: string[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(pins))
-  } catch {
-    /* ignore */
-  }
-}
+// Giltiga PIN-koder för ILVA Halmstad-personal. Dessa ger tillgång till rabattsidan.
+const EMPLOYEE_PINS = [
+  '1580', // Simon
+  '0000', // Johanna
+  '5153', // Marielle
+  '0505', // Nellie
+  '0000', // Ida
+  '0304', // Karin
+  '0000', // Isak
+]
 
 export function PinGuard({
   children,
@@ -34,11 +23,9 @@ export function PinGuard({
   description?: string
   position?: 'bottom' | 'center'
 }) {
-  const [pins, setPins] = useState<string[]>(() => loadPins())
   const [unlocked, setUnlocked] = useState(false)
   const [pin, setPin] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [hint, setHint] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -52,19 +39,9 @@ export function PinGuard({
       return
     }
 
-    if (pins.length === 0) {
-      const first = [pin]
-      savePins(first)
-      setPins(first)
-      setUnlocked(true)
-      setHint('PIN sparad.')
-      return
-    }
-
-    if (pins.includes(pin)) {
+    if (EMPLOYEE_PINS.includes(pin)) {
       setUnlocked(true)
       setError(null)
-      setHint(null)
     } else {
       setError('Fel PIN')
       setPin('')
@@ -127,14 +104,14 @@ export function PinGuard({
             </button>
           </div>
 
-          {(hint || error) && (
-            <p className={`text-center text-xs ${error ? 'text-red-600' : 'text-amber-700'}`}>
-              {error ?? hint}
+          {error && (
+            <p className="text-center text-xs text-red-600">
+              {error}
             </p>
           )}
 
           <p className="text-center text-[10px] leading-relaxed text-muted">
-            PIN-koder sparas lokalt.
+            Ange din 4-siffriga personliga PIN-kod.
           </p>
         </form>
       </div>

@@ -1,9 +1,9 @@
 [
-  { "id": "1", "name": "Johanna", "role": "Platschef ILVA Halmstad", "image": "/team/johanna.jpeg" },
-  { "id": "2", "name": "Ida", "role": "Biträdande chef", "image": "/team/ida.jpeg" },
-  { "id": "3", "name": "Isak", "role": "Säljare", "image": "/team/isak.jpeg" },
-  { "id": "4", "name": "Karin", "role": "Säljare", "image": "/team/karin.jpeg" },
-  { "id": "5", "name": "Marielle", "role": "Säljare", "image": "/team/marielle.jpeg" },
-  { "id": "6", "name": "Nellie", "role": "Säljare", "image": "/team/nellie.jpeg" },
-  { "id": "7", "name": "Simon", "role": "Säljare", "image": "/team/simon.jpeg" }
+  { "id": "1", "name": "Johanna", "role": "Platschef ILVA Halmstad", "pin": "0000", "image": "/team/johanna.jpeg" },
+  { "id": "2", "name": "Ida", "role": "Biträdande chef", "pin": "0000", "image": "/team/ida.jpeg" },
+  { "id": "3", "name": "Isak", "role": "Säljare", "pin": "0000", "image": "/team/isak.jpeg" },
+  { "id": "4", "name": "Karin", "role": "Säljare", "pin": "0304", "image": "/team/karin.jpeg" },
+  { "id": "5", "name": "Marielle", "role": "Säljare", "pin": "5153", "image": "/team/marielle.jpeg" },
+  { "id": "6", "name": "Nellie", "role": "Säljare", "pin": "0505", "image": "/team/nellie.jpeg" },
+  { "id": "7", "name": "Simon", "role": "Säljare", "pin": "1580", "image": "/team/simon.jpeg" }
 ]
