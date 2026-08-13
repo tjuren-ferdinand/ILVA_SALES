@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { Building2, Users, Lock, ArrowLeft, ArrowRight, Check, Store } from 'lucide-react'
+import { useState } from 'react'
+import { Building2, Users, Lock, ArrowLeft, ArrowRight, Check, Store as StoreIcon } from 'lucide-react'
 import { useSession } from '../../hooks/useSession'
 import type { Employee, Store } from '../../types'
 
@@ -37,7 +37,7 @@ function StoreSelector({ onSelect }: { onSelect: (id: string) => void }) {
     <div className="w-full max-w-2xl space-y-6">
       <div className="text-center">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/40 bg-white/40 backdrop-blur-xl">
-          <Store className="h-7 w-7 text-foreground/40" strokeWidth={1.5} />
+          <StoreIcon className="h-7 w-7 text-foreground/40" strokeWidth={1.5} />
         </div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">Välj butik</h1>
         <p className="mt-2 text-sm text-muted">Välj den ILVA-butik du arbetar på idag.</p>
