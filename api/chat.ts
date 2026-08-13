@@ -1,50 +1,11 @@
-import { createGroqReply, type ToolDefinition, type ToolExecutor } from '../src/server/groqChat'
-import { searchIlvaProducts } from '../src/server/ilvaScraper'
+/// <reference types="node" />
 
 const DEFAULT_MODEL = 'llama-3.1-8b-instant'
+const GROQ_API = 'https://api.groq.com/openai/v1/chat/completions'
 
-const chatTools: ToolDefinition[] = [
-  {
-    type: 'function',
-    function: {
-      name: 'search_ilva_products',
-      description: 'Sök efter produkter på ilva.se. Returnerar namn, pris, artikelnummer, kategori, bild-URL och länk för varje produkt.',
-      parameters: {
-        type: 'object',
-        properties: {
-          query: {
-            type: 'string',
-            description: 'Sökfråga, t.ex. "soffa", "matbord", "Cleveland", "fåtölj". Använd svenska eller danska möbeltermer.',
-          },
-          limit: {
-            type: 'number',
-            description: 'Max antal produkter att returnera (1-20). Standard är 8.',
-          },
-        },
-        required: ['query'],
-      },
-    },
-  },
-]
-
-const chatToolExecutor: ToolExecutor = async (name, args) => {
-  if (name === 'search_ilva_products') {
-    const query = String(args.query ?? '').trim()
-    if (!query) return 'Ingen sökfråga angiven.'
-    const limit = Math.min(Math.max(Number(args.limit ?? 8), 1), 20)
-    const products = await searchIlvaProducts(query, limit)
-    if (products.length === 0) return `Inga produkter hittades för "${query}".`
-    return JSON.stringify(products.map((p) => ({
-      namn: p.name,
-      pris: p.ordinaryPrice,
-      artikelnummer: p.articleNumber,
-      kategori: p.category,
-      serie: p.series,
-      bild: p.image,
-      url: p.url,
-    })))
-  }
-  return `Okänd funktion: ${name}`
+type ChatMessage = {
+  role: 'system' | 'user' | 'assistant'
+  content: string
 }
 
 type ChatRequest = {
@@ -59,31 +20,85 @@ type ChatResponse = {
   status: (code: number) => { json: (body: unknown) => void }
 }
 
+function isChatMessageArray(value: unknown): value is ChatMessage[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (m) =>
+        typeof m === 'object' &&
+        m !== null &&
+        typeof (m as { role?: unknown }).role === 'string' &&
+        typeof (m as { content?: unknown }).content === 'string'
+    )
+  )
+}
+
+function mapHttpStatus(rawStatus: number): number {
+  if (rawStatus === 429) return 429
+  if (rawStatus === 401 || rawStatus === 403) return 401
+  if (rawStatus >= 500) return 502
+  if (rawStatus >= 400) return 400
+  return 500
+}
+
 export default async function handler(req: ChatRequest, res: ChatResponse) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' })
     return
   }
 
-  const { messages, model } = req.body ?? {}
+  try {
+    const { messages, model } = req.body ?? {}
 
-  const apiKey = process.env.GROQ_API_KEY
-  if (!apiKey) {
-    res.status(500).json({ error: 'Servern saknar API-nyckel.' })
-    return
-  }
+    const apiKey = process.env.GROQ_API_KEY
+    if (!apiKey) {
+      res.status(500).json({ error: 'Servern saknar API-nyckel.' })
+      return
+    }
 
-  const result = await createGroqReply({
-    messages,
-    apiKey,
-    model: model ?? process.env.GROQ_MODEL ?? DEFAULT_MODEL,
-    tools: chatTools,
-    toolExecutor: chatToolExecutor,
-  })
+    if (!isChatMessageArray(messages) || messages.length === 0) {
+      res.status(400).json({ error: 'Ogiltigt meddelandeformat.' })
+      return
+    }
 
-  if (result.error) {
-    res.status(result.status).json({ error: result.error })
-  } else {
-    res.status(result.status).json({ reply: result.reply })
+    const response = await fetch(GROQ_API, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: model ?? process.env.GROQ_MODEL ?? DEFAULT_MODEL,
+        messages,
+        temperature: 0.4,
+        max_tokens: 1200,
+      }),
+    })
+
+    if (!response.ok) {
+      const text = await response.text().catch(() => 'Okänt fel')
+      let message = 'Groq svarade inte. Försök igen.'
+      if (response.status === 429) message = 'För många förfråganar just nu. Vänta en stund.'
+      if (response.status === 401) message = 'Ogiltig API-nyckel.'
+      if (response.status === 400) message = 'Ogiltig förfrågan.'
+      console.error('Groq error:', response.status, text)
+      res.status(mapHttpStatus(response.status)).json({ error: message })
+      return
+    }
+
+    const data = (await response.json()) as {
+      choices?: { message?: { content?: string } }[]
+    }
+    const reply = data.choices?.[0]?.message?.content?.trim()
+
+    if (!reply) {
+      res.status(200).json({ reply: 'Jag har inget svar just nu.' })
+      return
+    }
+
+    res.status(200).json({ reply })
+  } catch (err) {
+    console.error('Chat handler error:', err)
+    res.status(500).json({ error: 'Internt serverfel.' })
   }
 }
