@@ -14,6 +14,7 @@ import { Updates } from './pages/Updates'
 import { Favorites } from './pages/Favorites'
 import { Settings } from './pages/Settings'
 import { Showcase } from './pages/Showcase'
+import { Resurs } from './pages/Resurs'
 import { Team } from './pages/Team'
 import { Notes } from './pages/Notes'
 import { OfferPage } from './features/offers/pages/OfferPage'
@@ -24,6 +25,7 @@ function App() {
     <AppShell>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/resurs" element={<Resurs />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/delivery" element={<Delivery />} />
         <Route path="/delivery/:id" element={<DeliveryDetail />} />

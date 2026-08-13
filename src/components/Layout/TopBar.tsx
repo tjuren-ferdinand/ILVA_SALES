@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { Bell, User, LogOut, Settings, X } from 'lucide-react'
+import { Bell, User, LogOut, X, Store, ArrowRightLeft } from 'lucide-react'
 import { GlobalSearch } from '../Search/GlobalSearch'
-import { PilotLabel } from '../Branding/PilotLabel'
+import { useSession } from '../../hooks/useSession'
 
 function useClickOutside(ref: React.RefObject<HTMLElement | null>, onClose: () => void) {
   useEffect(() => {
@@ -20,6 +20,7 @@ export function TopBar() {
   const [showUser, setShowUser] = useState(false)
   const notisRef = useRef<HTMLDivElement>(null)
   const userRef = useRef<HTMLDivElement>(null)
+  const { activeStore, activeEmployee, timeLabel, switchStore, logout } = useSession()
 
   useClickOutside(notisRef, () => setShowNotis(false))
   useClickOutside(userRef, () => setShowUser(false))
@@ -30,7 +31,12 @@ export function TopBar() {
         <GlobalSearch variant="compact" />
       </div>
       <div className="flex items-center gap-4">
-        <PilotLabel />
+        <div className="flex items-center gap-2 rounded-2xl border border-white/40 bg-white/40 px-3 py-1.5 text-sm text-foreground backdrop-blur-xl">
+          <Store className="h-4 w-4 text-muted" strokeWidth={1.5} />
+          <span className="font-medium">{activeStore?.name}</span>
+          <span className="text-xs text-muted">· {activeEmployee?.name}</span>
+          <span className="hidden text-xs text-muted lg:inline">· {timeLabel}</span>
+        </div>
 
         <div ref={notisRef} className="relative">
           <button
@@ -73,14 +79,20 @@ export function TopBar() {
           {showUser && (
             <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-2xl border border-white/40 bg-white/85 p-3 shadow-2xl backdrop-blur-2xl">
               <button
-                onClick={() => setShowUser(false)}
+                onClick={() => {
+                  setShowUser(false)
+                  switchStore()
+                }}
                 className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-white/50"
               >
-                <Settings className="h-4 w-4" strokeWidth={1.5} />
-                Inställningar
+                <ArrowRightLeft className="h-4 w-4" strokeWidth={1.5} />
+                Byt butik
               </button>
               <button
-                onClick={() => setShowUser(false)}
+                onClick={() => {
+                  setShowUser(false)
+                  logout()
+                }}
                 className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-white/50"
               >
                 <LogOut className="h-4 w-4" strokeWidth={1.5} />

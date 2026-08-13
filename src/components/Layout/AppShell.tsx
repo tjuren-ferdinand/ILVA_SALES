@@ -4,9 +4,20 @@ import { Header } from './Header'
 import { TopBar } from './TopBar'
 import { ActiveUserBadge } from './ActiveUserBadge'
 import { Assistant } from '../AI/Assistant'
+import { LoginFlow } from '../Session/LoginFlow'
+import { useSession } from '../../hooks/useSession'
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { isAuthenticated } = useSession()
+
+  if (!isAuthenticated) {
+    return (
+      <div className="relative min-h-screen text-foreground">
+        <LoginFlow />
+      </div>
+    )
+  }
 
   return (
     <div className="relative min-h-screen text-foreground">

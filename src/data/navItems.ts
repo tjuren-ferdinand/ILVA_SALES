@@ -15,6 +15,7 @@ import {
   Users,
   FileText,
   NotebookPen,
+  Wallet,
 } from 'lucide-react'
 
 export type NavItem = {
@@ -26,6 +27,7 @@ export type NavItem = {
 export const topNav: NavItem[] = [
   { label: 'Hem', path: '/', icon: Home },
   { label: 'Offert', path: '/offert', icon: FileText },
+  { label: 'Resurs', path: '/resurs', icon: Wallet },
   { label: 'Sök', path: '/search', icon: Search },
   { label: 'Leverans', path: '/delivery', icon: Truck },
   { label: 'Rabatter', path: '/discounts', icon: Percent },

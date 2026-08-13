@@ -118,3 +118,54 @@ export type AppData = {
   contacts: Contact[]
   updates: UpdateItem[]
 }
+
+export type Employee = {
+  id: string
+  name: string
+  role: string
+  image?: string
+  pin: string
+  active?: boolean
+}
+
+export type Store = {
+  id: string
+  name: string
+  city: string
+  code: string
+  active: boolean
+  team: Employee[]
+  phone?: string
+  address?: string
+  email?: string
+}
+
+export type ResursPlanType = 'deferred' | 'installment'
+
+export type ResursPlan = {
+  id: string
+  name: string
+  type: ResursPlanType
+  months: number
+  interestRate: number // annual nominal %
+  setupFee: number // cents
+  monthlyFee: number // cents
+  campaignRate?: number // optional promotional annual %
+  active: boolean
+  displayOrder: number
+}
+
+export type ResursCalculation = {
+  amount: number // cents
+  months: number
+  type: ResursPlanType
+  interestRate: number
+  setupFee: number
+  monthlyFee: number
+  totalInterest: number
+  totalFees: number
+  monthlyPayment: number
+  finalPayment: number
+  totalCost: number
+  financedAmount: number
+}
