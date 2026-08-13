@@ -183,14 +183,29 @@ async function fetchIlvaProduct(url: string): Promise<OfferProduct> {
     return cached.product
   }
 
-  const html = await withTimeout(fetchHtml(url), 10000, `product ${url}`)
+  const html = await withTimeout(fetchHtml(url), 7000, `product ${url}`)
   const product = parseProductPage(html, url)
   productCache.set(url, { product, at: Date.now() })
   return product
 }
 
+async function fetchInBatches<T>(items: string[], batchSize: number, limit: number, onResult: (item: string) => Promise<T | null>): Promise<T[]> {
+  const results: T[] = []
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize)
+    const settled = await Promise.allSettled(batch.map((url) => onResult(url).catch(() => null)))
+    for (const s of settled) {
+      if (s.status === 'fulfilled' && s.value) {
+        results.push(s.value)
+        if (results.length >= limit) return results
+      }
+    }
+  }
+  return results
+}
+
 async function searchIlvaProducts(query: string, limit = 10): Promise<OfferProduct[]> {
-  const urls = await getSitemap()
+  const urls = await withTimeout(getSitemap(), 12000, 'sitemap')
   const terms = normalizeQuery(query)
   if (terms.length === 0) return []
 
@@ -198,16 +213,12 @@ async function searchIlvaProducts(query: string, limit = 10): Promise<OfferProdu
     .map((url) => ({ url, score: scoreUrl(url, terms) }))
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, Math.min(limit * 2, 40))
+    .slice(0, Math.min(limit * 3, 30))
 
-  const results = await Promise.allSettled(scored.map((s) => fetchIlvaProduct(s.url)))
-
-  const products: OfferProduct[] = []
-  for (const r of results) {
-    if (r.status === 'fulfilled') products.push(r.value)
-    if (products.length >= limit) break
-  }
-  return products
+  return fetchInBatches(scored.map((s) => s.url), 6, limit, async (url) => {
+    const product = await fetchIlvaProduct(url)
+    return product.name === 'ILVA-produkt' && product.ordinaryPrice === 0 ? null : product
+  })
 }
 
 function capitalize(s: string): string {

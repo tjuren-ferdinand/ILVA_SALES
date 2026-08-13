@@ -12,7 +12,7 @@ export function Sidebar({
 }) {
   return (
     <>
-      <aside className="fixed left-8 top-4 z-30 hidden h-[calc(100vh-2rem)] w-40 flex-col md:flex">
+      <aside className="fixed left-8 top-4 z-30 hidden h-[calc(100vh-2rem)] w-40 flex-col md:flex print:hidden">
         <div className="mb-8 select-none">
           <div className="text-2xl font-semibold tracking-tight text-foreground">ILVA</div>
           <div className="text-sm font-medium text-muted">Sales Hub</div>

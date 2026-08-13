@@ -154,7 +154,7 @@ export function OfferPage() {
         )}
       </div>
 
-      <div className="hidden print:!block fixed inset-0 z-[100] overflow-auto bg-white p-6 md:p-12">
+      <div className="quote-print hidden print:!block">
         <QuotePreview quote={quote} totals={totals} />
       </div>
     </div>

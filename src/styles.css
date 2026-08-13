@@ -15,20 +15,98 @@
 }
 
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 1.2cm;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  html,
   body {
     background: white !important;
+    color: black !important;
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
   }
+
+  body > #root > div {
+    background: white !important;
+  }
+
+  .quote-print {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white !important;
+    color: black !important;
+  }
+
   .quote-document {
-    max-width: none !important;
+    max-width: 100% !important;
     width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
     background: white !important;
+    color: black !important;
+    box-shadow: none !important;
   }
+
   .quote-document .surface,
-  .quote-document .glass {
+  .quote-document .glass,
+  .surface,
+  .glass {
     border: none !important;
     box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid;
+  }
+
+  article {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3 {
+    color: black !important;
+    page-break-after: avoid;
+  }
+
+  p,
+  li {
+    color: black !important;
+  }
+
+  .text-muted,
+  .text-foreground {
+    color: black !important;
+  }
+
+  .border-border,
+  .border-white\/30,
+  .border-white\/40 {
+    border-color: #e5e4e7 !important;
+  }
+
+  .bg-white,
+  .bg-surface,
+  .bg-background {
     background: transparent !important;
   }
 }

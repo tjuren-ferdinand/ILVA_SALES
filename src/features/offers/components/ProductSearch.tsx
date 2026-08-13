@@ -67,7 +67,7 @@ export function ProductSearch({
   onSelect: (p: OfferProduct) => void
   onAdd: (p: OfferProduct) => void
 }) {
-  const { query, setQuery, results, searching, error } = useProductSearch(100)
+  const { query, setQuery, results, searching, stale, error } = useProductSearch(250)
   const [showManual, setShowManual] = useState(false)
 
   const setTerm = (term: string) => {
@@ -125,14 +125,14 @@ export function ProductSearch({
         ))}
       </div>
 
-      {searching && (
+      {(searching || stale) && (
         <div className="mt-4 flex items-center gap-2 text-sm text-muted">
           <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5} />
-          Söker på ILVA…
+          {results.length > 0 ? 'Uppdaterar resultat…' : 'Söker på ILVA…'}
         </div>
       )}
 
-      {searching && <SearchSkeleton />}
+      {searching && results.length === 0 && <SearchSkeleton />}
 
       {!searching && error && (
         <div className="mt-4 rounded-2xl border border-amber-200/50 bg-amber-50/60 p-4 text-sm text-amber-800">
@@ -140,7 +140,7 @@ export function ProductSearch({
         </div>
       )}
 
-      {!searching && query.length >= 2 && results.length === 0 && !error && (
+      {!searching && !stale && query.length >= 2 && results.length === 0 && !error && (
         <div className="mt-4 rounded-2xl border border-amber-200/50 bg-amber-50/60 p-4 text-sm text-amber-800">
           <p>Inga träffar på ILVA.se för ”{query}”.</p>
           <p className="mt-1 text-xs text-amber-700">Prova en snabbsökning ovan eller ange artikeln manuellt.</p>
@@ -171,7 +171,7 @@ export function ProductSearch({
         />
       )}
 
-      {!searching && results.length > 0 && (
+      {results.length > 0 && (
         <div className="mt-4 space-y-3">
           <div className="flex items-center justify-between text-xs text-muted">
             <span>{results.length} träffar</span>
