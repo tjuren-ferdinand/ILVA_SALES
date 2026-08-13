@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useSession } from '../../../hooks/useSession'
 import type { CustomerInfo, DiscountMode, OfferProduct, OfferQuote, OfferQuoteItem } from '../types'
 import { calculateQuoteTotals, validateDiscount } from '../lib/calculations'
 import {
@@ -21,16 +22,24 @@ const emptyCustomer: CustomerInfo = {
   city: '',
 }
 
-function createEmptyQuote(): OfferQuote {
+function createEmptyQuote(
+  storeCode: string,
+  storeId: string,
+  storeName: string,
+  sellerId: string,
+  sellerName: string
+): OfferQuote {
   return {
     id: `q-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
-    quoteNumber: nextQuoteNumber(),
+    storeId,
+    sellerId,
+    quoteNumber: nextQuoteNumber(storeCode),
     createdAt: new Date().toISOString(),
     validDays: 30,
     status: 'draft',
     customer: emptyCustomer,
-    salesperson: { name: 'Demo Säljare' },
-    store: { name: 'ILVA Halmstad' },
+    salesperson: { name: sellerName },
+    store: { name: storeName },
     items: [],
     globalDiscount: { mode: 'percent', value: 0 },
     customerNote: '',
@@ -39,7 +48,18 @@ function createEmptyQuote(): OfferQuote {
 }
 
 export function useQuote() {
-  const [quote, setQuote] = useState<OfferQuote>(() => loadDraft() ?? createEmptyQuote())
+  const { activeStore, activeEmployee } = useSession()
+  const storeCode = activeStore?.code ?? 'HAL'
+  const storeId = activeStore?.id ?? 'unknown'
+  const storeName = activeStore?.name ?? 'ILVA'
+  const sellerId = activeEmployee?.id ?? 'unknown'
+  const sellerName = activeEmployee?.name ?? 'Säljare'
+
+  const [quote, setQuote] = useState<OfferQuote>(
+    () =>
+      loadDraft() ??
+      createEmptyQuote(storeCode, storeId, storeName, sellerId, sellerName)
+  )
   const [history, setHistory] = useState<OfferQuote[]>(() => loadHistory())
 
   useEffect(() => {
@@ -136,8 +156,8 @@ export function useQuote() {
 
   const resetQuote = useCallback(() => {
     clearDraft()
-    setQuote(createEmptyQuote())
-  }, [])
+    setQuote(createEmptyQuote(storeCode, storeId, storeName, sellerId, sellerName))
+  }, [storeCode, storeId, storeName, sellerId, sellerName])
 
   const totals = useMemo(() => calculateQuoteTotals(quote), [quote])
 

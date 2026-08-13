@@ -18,6 +18,8 @@ export type PageContext = {
   path: string
   label: string
   detail?: string
+  storeName?: string
+  sellerName?: string
 }
 
 const deliveryContext = deliveryOptions
@@ -38,6 +40,8 @@ const rules = discounts
 const productRulesContext = productRules
   .map((p) => `- ${p.name} (${p.category}): ${p.description} Regler: ${p.rules.join(', ')}`)
   .join('\n')
+
+const resursContext = `Resurs är ILVAs finansieringspartner. Du kan beräkna finansiering på /resurs. Exempelvilloren är konfigurerbara och ska inte presenteras som garantier.`
 
 const orderContext = orderProcedures
   .map((o) => `- ${o.title}: ${o.description} Steg: ${o.steps.join(' → ')}`)
@@ -110,6 +114,11 @@ Använd det när säljaren frågar om specifika produkter, priser, färger, vari
 Sök med svenska eller danska möbeltermer (t.ex. "soffa", "matbord", "fåtölj", "säng").
 När du får sökresultat, presentera produkterna tydligt med namn, pris och artikelnummer.
 
+=== RESURS FINANSIERING ===
+${resursContext}
+- Resurs-kalkylatorn finns under /resurs och kan öppnas direkt från offertens totalsumma.
+- Användbart när kunden frågar om delbetalning eller betala-senare-lösningar.
+
 === VÄGLEDNING ===
 - Hjälp säljaren att välja rätt leveranskod efter postnummer.
 - Påminn alltid om att "Fast lågt pris" inte får rabatteras.
@@ -124,7 +133,9 @@ export async function sendChatMessage(messages: ChatMessage[], pageContext?: Pag
   const timeout = setTimeout(() => controller.abort(), 45000)
 
   const contextSuffix = pageContext
-    ? `\n\n=== ANVÄNDARENS AKTUELLA SIDA ===\nSäljaren befinner sig på: ${pageContext.label} (${pageContext.path})${pageContext.detail ? `\nKontext: ${pageContext.detail}` : ''}\nAnpassa svaret utifrån vilken sida användaren är på när det är relevant.`
+    ? `\n\n=== ANVÄNDARENS AKTUELLA SIDA ===\nSäljaren befinner sig på: ${pageContext.label} (${pageContext.path})${pageContext.detail ? `\nKontext: ${pageContext.detail}` : ''}${
+        pageContext.storeName ? `\nAktiv butik: ${pageContext.storeName}` : ''
+      }${pageContext.sellerName ? `\nSäljare: ${pageContext.sellerName}` : ''}\nAnpassa svaret utifrån vilken sida användaren är på när det är relevant.`
     : ''
 
   try {

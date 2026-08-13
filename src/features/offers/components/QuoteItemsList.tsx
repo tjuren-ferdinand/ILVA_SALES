@@ -104,9 +104,9 @@ function QuoteItemRow({
   }
 
   return (
-    <div className="surface p-4">
-      <div className="flex gap-4">
-        <div className="w-24 shrink-0">
+    <div className="surface p-3">
+      <div className="flex gap-3">
+        <div className="w-16 shrink-0">
           <ProductImage product={item.product} className="w-full" aspect="1/1" />
         </div>
         <div className="min-w-0 flex-1">
@@ -199,18 +199,13 @@ function QuoteItemRow({
             </p>
           )}
 
-          <div className="mt-4 grid grid-cols-3 gap-2 border-t border-white/30 pt-3 text-right">
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted">Ordinarie</p>
-              <p className="text-sm text-muted">{formatPrice(item.product.ordinaryPrice)}</p>
+          <div className="mt-3 flex items-center justify-between border-t border-white/30 pt-2 text-sm">
+            <div className="text-muted">
+              Ord. <span className="text-foreground">{formatPrice(item.product.ordinaryPrice)}</span>
             </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted">Kundpris</p>
-              <p className="text-sm font-medium text-foreground">{formatPrice(customerUnit)}</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted">Rad</p>
-              <p className="text-sm font-semibold text-foreground">{formatPrice(customerLineTotal)}</p>
+            <div className="text-right">
+              <span className="text-muted">Kundpris </span>
+              <span className="font-semibold text-foreground">{formatPrice(customerLineTotal)}</span>
             </div>
           </div>
         </div>

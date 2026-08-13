@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { Search, Plus, ExternalLink, X, Loader2, TrendingUp, Lightbulb } from 'lucide-react'
 import { useProductSearch } from '../hooks/useProductSearch'
 import { openIlvaSearch } from '../services/productSearch'
@@ -60,7 +60,7 @@ function QuickSearchChip({
   )
 }
 
-export function ProductSearch({
+function ProductSearchComponent({
   onSelect,
   onAdd,
 }: {
@@ -218,3 +218,5 @@ export function ProductSearch({
     </div>
   )
 }
+
+export const ProductSearch = memo(ProductSearchComponent)

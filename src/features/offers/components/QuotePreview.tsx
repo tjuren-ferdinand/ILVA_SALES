@@ -71,21 +71,21 @@ export function QuotePreview({ quote, totals }: { quote: OfferQuote; totals: Quo
             return (
               <article
                 key={item.id}
-                className="grid gap-6 border-b border-border pb-8 sm:grid-cols-[240px_1fr]"
+                className="grid gap-5 border-b border-border pb-6 sm:grid-cols-[180px_1fr]"
               >
                 <ProductImage product={item.product} className="w-full" aspect="4/3" />
                 <div>
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="text-xs font-medium uppercase tracking-widest text-muted">
+                      <p className="text-[10px] font-medium uppercase tracking-widest text-muted">
                         {item.product.brand ?? item.product.category}
                       </p>
-                      <h3 className="mt-1 text-2xl font-semibold text-foreground">{item.product.name}</h3>
+                      <h3 className="mt-1 text-xl font-semibold text-foreground">{item.product.name}</h3>
                       <p className="mt-1 text-sm text-muted">
                         Art.nr. {item.product.articleNumber} · {item.product.category}
                       </p>
                     </div>
-                    <p className="text-2xl font-light text-foreground">{formatPrice(customerUnit)}</p>
+                    <p className="text-xl font-light text-foreground">{formatPrice(customerUnit)}</p>
                   </div>
 
                   <div className="mt-6 grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
@@ -117,7 +117,7 @@ export function QuotePreview({ quote, totals }: { quote: OfferQuote; totals: Quo
         </div>
       </section>
 
-      <section className="mb-12 border-t border-border pt-8">
+      <section className="mb-12 border-t border-border pt-6">
         <div className="ml-auto max-w-sm space-y-2 text-right">
           <div className="flex justify-between text-sm text-muted">
             <span>Ordinarie pris</span>

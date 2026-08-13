@@ -1,16 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Lock, ArrowRight } from 'lucide-react'
-
-// Giltiga PIN-koder för ILVA Halmstad-personal. Dessa ger tillgång till rabattsidan.
-const EMPLOYEE_PINS = [
-  '1580', // Simon
-  '0000', // Johanna
-  '5153', // Marielle
-  '0505', // Nellie
-  '0000', // Ida
-  '0304', // Karin
-  '0000', // Isak
-]
+import { useSession } from '../hooks/useSession'
 
 export function PinGuard({
   children,
@@ -23,7 +13,7 @@ export function PinGuard({
   description?: string
   position?: 'bottom' | 'center'
 }) {
-  const [unlocked, setUnlocked] = useState(false)
+  const { activeEmployee, isAuthenticated, authenticate } = useSession()
   const [pin, setPin] = useState('')
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -39,8 +29,7 @@ export function PinGuard({
       return
     }
 
-    if (EMPLOYEE_PINS.includes(pin)) {
-      setUnlocked(true)
+    if (authenticate(pin)) {
       setError(null)
     } else {
       setError('Fel PIN')
@@ -49,7 +38,7 @@ export function PinGuard({
     }
   }
 
-  if (unlocked) {
+  if (isAuthenticated) {
     return <>{children}</>
   }
 
@@ -111,7 +100,7 @@ export function PinGuard({
           )}
 
           <p className="text-center text-[10px] leading-relaxed text-muted">
-            Ange din 4-siffriga personliga PIN-kod.
+            Ange din 4-siffriga personliga PIN-kod för {activeEmployee?.name ?? 'säljare'}.
           </p>
         </form>
       </div>

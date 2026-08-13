@@ -23,12 +23,12 @@ export function clearDraft() {
   localStorage.removeItem(DRAFT_KEY)
 }
 
-export function nextQuoteNumber(): string {
+export function nextQuoteNumber(storeCode = 'HAL'): string {
   const year = new Date().getFullYear()
   const raw = localStorage.getItem(QUOTE_COUNTER_KEY) ?? '0'
   const next = parseInt(raw, 10) + 1
   localStorage.setItem(QUOTE_COUNTER_KEY, String(next))
-  return `ILVA-HAL-${year}-${String(next).padStart(4, '0')}`
+  return `ILVA-${storeCode}-${year}-${String(next).padStart(4, '0')}`
 }
 
 export function loadHistory(): OfferQuote[] {

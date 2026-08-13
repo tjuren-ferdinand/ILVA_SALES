@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+import { Wallet } from 'lucide-react'
 import { formatPrice } from '../lib/calculations'
 import type { GlobalDiscount, OfferQuote, QuoteTotals } from '../types'
 
@@ -100,6 +102,19 @@ export function QuoteSummaryPanel({
         <p className="text-right text-xs text-muted">
           {totals.productCount} produkter · {totals.itemCount} artiklar
         </p>
+      </div>
+
+      <div className="mt-5 border-t border-white/30 pt-5">
+        <Link
+          to={`/resurs?amount=${totals.finalTotal}&back=/offert`}
+          className="flex items-center justify-between rounded-2xl border border-white/40 bg-white/40 px-4 py-3 text-sm font-medium text-foreground backdrop-blur-xl transition hover:bg-white/60"
+        >
+          <span className="flex items-center gap-2">
+            <Wallet className="h-4 w-4" strokeWidth={1.5} />
+            Finansiera med Resurs
+          </span>
+          <span className="text-muted">från {formatPrice(totals.finalTotal)}</span>
+        </Link>
       </div>
     </div>
   )

@@ -2,19 +2,19 @@ import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Sparkles, Send, X, MessageSquare, AlertCircle } from 'lucide-react'
 import { sendChatMessage, type ChatMessage, type PageContext } from '../../lib/ai/groq'
+import { useSession } from '../../hooks/useSession'
 import { topNav, bottomNav } from '../../data/navItems'
 
 const routeLabels = new Map<string, string>([
   ...topNav.map((n) => [n.path, n.label] as [string, string]),
   ...bottomNav.map((n) => [n.path, n.label] as [string, string]),
-  ['/offert', 'Offert'],
 ])
 
-function buildPageContext(pathname: string): PageContext {
+function buildPageContext(pathname: string, storeName?: string, sellerName?: string): PageContext {
   const label = routeLabels.get(pathname)
-  if (label) return { path: pathname, label }
-  if (pathname.startsWith('/delivery/')) return { path: pathname, label: 'Leveransdetaljer', detail: 'Visar detaljer för ett specifikt leveransalternativ' }
-  return { path: pathname, label: 'ILVA Sälj-appen' }
+  if (label) return { path: pathname, label, storeName, sellerName }
+  if (pathname.startsWith('/delivery/')) return { path: pathname, label: 'Leveransdetaljer', detail: 'Visar detaljer för ett specifikt leveransalternativ', storeName, sellerName }
+  return { path: pathname, label: 'ILVA Sälj-appen', storeName, sellerName }
 }
 
 export function Assistant() {
@@ -30,6 +30,7 @@ export function Assistant() {
   const [error, setError] = useState<string | null>(null)
   const endRef = useRef<HTMLDivElement>(null)
   const location = useLocation()
+  const { activeStore, activeEmployee } = useSession()
 
   useEffect(() => {
     if (open) {
@@ -49,7 +50,7 @@ export function Assistant() {
     setLoading(true)
 
     try {
-      const pageCtx = buildPageContext(location.pathname)
+      const pageCtx = buildPageContext(location.pathname, activeStore?.name, activeEmployee?.name)
       const answer = await sendChatMessage(nextMessages, pageCtx)
       setMessages([...nextMessages, { role: 'assistant', content: answer }])
     } catch (err) {

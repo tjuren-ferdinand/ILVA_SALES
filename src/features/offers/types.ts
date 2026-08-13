@@ -49,6 +49,8 @@ export type QuoteStatus = 'draft' | 'ready' | 'sent'
 
 export type OfferQuote = {
   id: string
+  storeId: string
+  sellerId: string
   quoteNumber: string
   createdAt: string
   validDays: number
