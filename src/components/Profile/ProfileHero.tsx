@@ -19,10 +19,10 @@ function initials(name: string) {
 }
 
 const CATCHY_LINES = [
-  'Hej, vem assisterar jag idag?',
-  'Redo att göra ett kundmöte magiskt?',
-  'Vem tar rodret nu?',
-  'Klicka in dig — kunden väntar.',
+  'Redo för nästa kundmöte?',
+  'Redo att göra ett kundmöte enkelt?',
+  'Välkommen till ILVA Sales Hub',
+  'Vem assisterar jag idag?',
 ]
 
 function Avatar({
@@ -93,7 +93,7 @@ export function ProfileHero({ variant = 'full' }: { variant?: 'full' | 'compact'
 
   if (compact) {
     return (
-      <div className="flex flex-col items-center gap-3 py-1 text-center sm:flex-row sm:justify-between sm:text-left">
+      <div className="flex items-center justify-between gap-4">
         {user ? (
           <div key={user.id} className="profile-enter flex items-center gap-3">
             <Avatar image={user.image} name={user.name} size="xs" ring />
@@ -115,26 +115,23 @@ export function ProfileHero({ variant = 'full' }: { variant?: 'full' | 'compact'
             </button>
           </div>
         ) : (
-          <div className="profile-enter">
+          <div className="profile-enter min-w-0">
             <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">{catchyLine}</h1>
           </div>
         )}
 
         {(!user || true) && (
-          <div className="flex flex-wrap items-center justify-center gap-2">
+          <div className="flex flex-nowrap items-center gap-1.5 overflow-hidden">
             {!user &&
               members.map((m, i) => (
                 <button
                   key={m.id}
                   onClick={() => activate(m)}
                   style={{ animationDelay: `${i * 40}ms` }}
-                  className="profile-card group flex items-center gap-1.5 rounded-full py-1 pl-1 pr-2.5 transition hover:bg-white/40"
+                  className="profile-card group relative shrink-0 transition hover:scale-105"
                   title={m.name}
                 >
                   <Avatar image={m.image} name={m.name} size="xs" />
-                  <span className="text-xs font-medium text-muted transition group-hover:text-foreground">
-                    {m.name}
-                  </span>
                 </button>
               ))}
           </div>

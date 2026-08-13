@@ -76,9 +76,7 @@ export function Home() {
     .sort((a, b) => mainPaths.indexOf(a.path) - mainPaths.indexOf(b.path))
 
   return (
-    <div className="space-y-6 md:space-y-8">
-      <ProfileHero variant="compact" />
-
+    <div className="space-y-5 md:space-y-6">
       <section className="space-y-3">
         <div className="relative">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.5} />
@@ -102,6 +100,8 @@ export function Home() {
             </button>
           )}
         </div>
+
+        <ProfileHero variant="compact" />
       </section>
 
       <section>
