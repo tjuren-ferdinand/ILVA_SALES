@@ -61,3 +61,46 @@
     background: rgba(0, 0, 0, 0.22);
   }
 }
+
+/* Profile animations */
+@layer utilities {
+  @keyframes profileEnter {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  @keyframes profileEnter2 {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes profileCardIn {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  .profile-enter {
+    animation: profileEnter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .profile-enter-2 {
+    animation: profileEnter2 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  }
+  .profile-card {
+    animation: profileCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}

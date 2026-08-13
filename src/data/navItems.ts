@@ -2,7 +2,6 @@ import {
   Home,
   Search,
   Truck,
-  FileCode,
   Percent,
   Package,
   Sofa,
@@ -14,8 +13,8 @@ import {
   Star,
   Settings,
   Users,
-  Image,
   FileText,
+  NotebookPen,
 } from 'lucide-react'
 
 export type NavItem = {
@@ -29,17 +28,16 @@ export const topNav: NavItem[] = [
   { label: 'Offert', path: '/offert', icon: FileText },
   { label: 'Sök', path: '/search', icon: Search },
   { label: 'Leverans', path: '/delivery', icon: Truck },
-  { label: 'Koder', path: '/codes', icon: FileCode },
   { label: 'Rabatter', path: '/discounts', icon: Percent },
   { label: 'Beställningar', path: '/orders', icon: Package },
   { label: 'Produkter', path: '/products', icon: Sofa },
-  { label: 'Retur & reklamation', path: '/returns', icon: RotateCcw },
+  { label: 'Returer', path: '/returns', icon: RotateCcw },
   { label: 'Betalning', path: '/payment', icon: CreditCard },
   { label: 'System', path: '/systems', icon: Monitor },
   { label: 'Kontakter', path: '/contacts', icon: Phone },
   { label: 'Uppdateringar', path: '/updates', icon: Bell },
-  { label: 'Visa kund', path: '/showcase', icon: Image },
-  { label: 'Team', path: '/team', icon: Users },
+  { label: 'Profil', path: '/team', icon: Users },
+  { label: 'Anteckningar', path: '/notes', icon: NotebookPen },
 ]
 
 export const bottomNav: NavItem[] = [

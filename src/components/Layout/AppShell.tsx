@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { TopBar } from './TopBar'
+import { ActiveUserBadge } from './ActiveUserBadge'
 import { Assistant } from '../AI/Assistant'
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -10,6 +11,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative min-h-screen text-foreground">
       <Header onMenuClick={() => setMobileOpen(true)} />
+      <ActiveUserBadge />
       <div className="flex min-h-screen flex-col md:flex-row">
         <Sidebar
           mobileOpen={mobileOpen}

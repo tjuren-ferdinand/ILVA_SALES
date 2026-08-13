@@ -4,44 +4,25 @@ import { Search, X, ChevronRight, AlertCircle, Info } from 'lucide-react'
 import { FunctionCard } from '../components/ui/FunctionCard'
 import { ProductCredit } from '../components/Branding/ProductCredit'
 import { Badge } from '../components/ui/Badge'
-import { formatGreeting } from '../lib/utils'
 import { topNav } from '../data/navItems'
 import { updates } from '../data/mockData'
+import { ProfileHero } from '../components/Profile/ProfileHero'
 import type { UpdateItem } from '../types'
 
-const mainPaths = [
-  '/delivery',
-  '/codes',
-  '/discounts',
-  '/orders',
-  '/products',
-  '/returns',
-  '/payment',
-  '/systems',
-]
+const mainPaths = ['/offert', '/delivery', '/discounts', '/returns']
 
 const quickItems = [
-  { to: '/codes', title: 'Vanliga leveranskoder', description: 'Mest använda just nu' },
+  { to: '/products', title: 'Sök ILVA-produkter', description: 'Riktig produktsökning för kunden' },
   { to: '/discounts', title: 'Maxrabatter', description: 'Aktuella gränser' },
   { to: '/delivery', title: 'Leverans per postnummer', description: 'Ange kundens postnummer' },
-  { to: '/returns', title: 'Reklamationsguide', description: 'Vanliga situationer' },
+  { to: '/returns', title: 'Returguide', description: 'Retur, reklamation & öppet köp' },
 ]
 
 const functionDescriptions: Record<string, string> = {
-  Offert: '',
-  Sök: '',
-  Leverans: '',
-  Koder: '',
-  Rabatter: '',
-  Beställningar: '',
-  Produkter: '',
-  'Retur & reklamation': '',
-  Betalning: '',
-  System: '',
-  Kontakter: '',
-  Uppdateringar: '',
-  'Visa kund': '',
-  Team: '',
+  Offert: 'Skapa & skicka till kund',
+  Leverans: 'Alternativ & priser',
+  Rabatter: 'Max rabatt per kategori',
+  Returer: 'Retur, reklamation & öppet köp',
 }
 
 function QuickRow({ to, title, description }: { to: string; title: string; description: string }) {
@@ -96,14 +77,10 @@ export function Home() {
 
   return (
     <div className="space-y-6 md:space-y-8">
-      <section className="space-y-3">
-        <div className="mb-1 text-xs font-medium uppercase tracking-wide text-muted">ILVA Halmstad</div>
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-          {formatGreeting()}.
-        </h1>
-        <p className="text-sm text-muted">All information du behöver för att sälja, på ett ställe.</p>
+      <ProfileHero variant="compact" />
 
-        <div className="relative mt-4">
+      <section className="space-y-3">
+        <div className="relative">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.5} />
           <input
             type="text"
@@ -129,7 +106,7 @@ export function Home() {
 
       <section>
         <div className="mb-3 text-xs font-medium uppercase tracking-wide text-muted">Huvudfunktioner</div>
-        <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-8">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {functions.map((item) => (
             <FunctionCard
               key={item.path}

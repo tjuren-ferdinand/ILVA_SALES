@@ -59,6 +59,7 @@ export type OrderProcedure = {
 export type ReturnProcedure = {
   id: string
   title: string
+  type: 'retur' | 'reklamation' | 'oppet-kop'
   description: string
   steps: string[]
   keywords: string[]

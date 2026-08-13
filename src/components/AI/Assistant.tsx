@@ -1,19 +1,35 @@
 import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { Sparkles, Send, X, MessageSquare, AlertCircle } from 'lucide-react'
-import { sendChatMessage, type ChatMessage } from '../../lib/ai/groq'
+import { sendChatMessage, type ChatMessage, type PageContext } from '../../lib/ai/groq'
+import { topNav, bottomNav } from '../../data/navItems'
+
+const routeLabels = new Map<string, string>([
+  ...topNav.map((n) => [n.path, n.label] as [string, string]),
+  ...bottomNav.map((n) => [n.path, n.label] as [string, string]),
+  ['/offert', 'Offert'],
+])
+
+function buildPageContext(pathname: string): PageContext {
+  const label = routeLabels.get(pathname)
+  if (label) return { path: pathname, label }
+  if (pathname.startsWith('/delivery/')) return { path: pathname, label: 'Leveransdetaljer', detail: 'Visar detaljer för ett specifikt leveransalternativ' }
+  return { path: pathname, label: 'ILVA Sälj-appen' }
+}
 
 export function Assistant() {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
-      content: 'Hej! Jag är din ILVA Säljassistent. Ställ en fråga om leverans, rabatt eller en produkt.',
+      content: 'Hej! Jag är din ILVA Säljassistent. Jag kan svara på allt om appen – leverans, rabatter, produkter, ordrar, returer, betalning, system, kontakter och mer. Fråga mig vad som helst!',
     },
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const endRef = useRef<HTMLDivElement>(null)
+  const location = useLocation()
 
   useEffect(() => {
     if (open) {
@@ -33,7 +49,8 @@ export function Assistant() {
     setLoading(true)
 
     try {
-      const answer = await sendChatMessage(nextMessages)
+      const pageCtx = buildPageContext(location.pathname)
+      const answer = await sendChatMessage(nextMessages, pageCtx)
       setMessages([...nextMessages, { role: 'assistant', content: answer }])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Något gick fel.')
@@ -111,7 +128,7 @@ export function Assistant() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Fråga om leverans, rabatt, produkt…"
+              placeholder="Fråga om vad som helst…"
               className="flex-1 bg-transparent px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted"
             />
             <button

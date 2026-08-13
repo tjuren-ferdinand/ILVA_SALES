@@ -53,6 +53,14 @@ function normalizeQuery(query: string): string[] {
     .filter((w) => w.length > 1)
 }
 
+// Crude Swedish stemmer: strips common noun endings (soffa -> soff, soffor -> soff, sängar -> säng)
+// so that singular/plural/definite forms of a word all match the same slug.
+function stem(word: string): string {
+  if (word.length <= 4) return word
+  const stripped = word.replace(/(ornas|arnas|ornar|arna|erna|orna|ors|ars|na|or|ar|er|en|et|s|a)$/, '')
+  return stripped.length >= 3 ? stripped : word
+}
+
 function scoreUrl(url: string, terms: string[]): number {
   const slug = url.replace(/^https?:\/\/[^/]+/, '').toLowerCase()
   const normalizedSlug = slug
@@ -62,7 +70,12 @@ function scoreUrl(url: string, terms: string[]): number {
 
   let score = 0
   for (const term of terms) {
-    if (normalizedSlug.includes(term)) score += 1
+    if (normalizedSlug.includes(term)) {
+      score += 2
+    } else {
+      const stemmed = stem(term)
+      if (stemmed !== term && normalizedSlug.includes(stemmed)) score += 1
+    }
     const m = url.match(/p-(\d+)-\d+\/$/)
     if (m && term === m[1]) score += 5
   }
@@ -104,6 +117,36 @@ export async function fetchIlvaProduct(url: string): Promise<OfferProduct> {
   return product
 }
 
+// ILVA publishes each color/fabric option of a model as its own sitemap URL that
+// shares the same model folder (e.g. .../cleveland/wave-70-sand-textil/p-.../ and
+// .../cleveland/austin-18-l-grey-tyg/p-.../ are both "Cleveland" variants). We use
+// that to surface real color/material options instead of fake placeholder swatches.
+export async function getProductVariants(url: string, limit = 6): Promise<OfferProduct[]> {
+  const pathParts = new URL(url).pathname.split('/').filter(Boolean)
+  if (pathParts.length < 3) return []
+  // Everything up to and including the model folder (one level above the variant folder).
+  const modelPrefix = pathParts.slice(0, pathParts.length - 2).join('/')
+
+  const urls = await getSitemap()
+  const siblingUrls = urls.filter((u) => {
+    if (u === url) return false
+    try {
+      const parts = new URL(u).pathname.split('/').filter(Boolean)
+      return parts.slice(0, parts.length - 2).join('/') === modelPrefix
+    } catch {
+      return false
+    }
+  })
+
+  const candidates = siblingUrls.slice(0, limit)
+  const results = await Promise.allSettled(candidates.map((u) => fetchIlvaProduct(u)))
+  const variants: OfferProduct[] = []
+  for (const r of results) {
+    if (r.status === 'fulfilled') variants.push(r.value)
+  }
+  return variants
+}
+
 export function parseProductPage(html: string, url: string): OfferProduct {
   const titleMatch = html.match(/<meta[^>]*?og:title[^>]*?content="([^"]*)"[^>]*?>/i)
   const descMatch = html.match(/<meta[^>]*?og:description[^>]*?content="([^"]*)"[^>]*?>/i)
@@ -122,10 +165,31 @@ export function parseProductPage(html: string, url: string): OfferProduct {
     .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ')
 
-  const priceMatches = [...text.matchAll(/(\d[\d\s\.]*):-/g)]
+  // Anchor price search near a repeated occurrence of the product title (the page
+  // header/hero repeats the name right before its price) rather than scanning the
+  // whole page, since <title> tag text appears far earlier with no price nearby,
+  // and nav/footer promo text elsewhere also contains unrelated ":-" price snippets.
+  let priceMatches: RegExpMatchArray[] = []
+  if (name) {
+    let searchFrom = 0
+    while (searchFrom < text.length) {
+      const idx = text.indexOf(name, searchFrom)
+      if (idx === -1) break
+      const window = text.slice(idx, idx + 300)
+      const found = [...window.matchAll(/(\d[\d\s.]*):-/g)]
+      if (found.length > 0) {
+        priceMatches = found
+        break
+      }
+      searchFrom = idx + name.length
+    }
+  }
+  if (priceMatches.length === 0) {
+    priceMatches = [...text.matchAll(/(\d[\d\s.]*):-/g)]
+  }
   const prices = priceMatches
     .map((m) => {
-      const raw = m[1].replace(/[\s\.]/g, '').replace(/&nbsp;/g, '')
+      const raw = m[1].replace(/[\s.]/g, '').replace(/&nbsp;/g, '')
       const num = parseInt(raw, 10)
       return isNaN(num) ? 0 : num
     })
@@ -141,12 +205,19 @@ export function parseProductPage(html: string, url: string): OfferProduct {
   const category =
     pathParts.length > 3 ? pathParts[pathParts.length - 4]?.replace(/-/g, ' ') : ''
 
+  // The variant folder (color/fabric slug) sits right before the p-xxxx filename,
+  // e.g. "wave-70-sand-textil" -> "Wave 70 Sand Textil". Used to label real
+  // color/material variants of the same model in the UI.
+  const variantSlug = pathParts.length > 1 ? pathParts[pathParts.length - 2] : ''
+  const series = variantSlug ? capitalize(variantSlug.replace(/-/g, ' ')) : ''
+
   return {
     id: `ilva-${articleNumber}-${idMatch ? idMatch[2] : Date.now()}`,
     name,
     articleNumber,
     category: category ? capitalize(category) : 'ILVA',
     brand,
+    series,
     ordinaryPrice,
     source: 'ilva',
     url,
