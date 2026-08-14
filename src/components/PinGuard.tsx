@@ -13,7 +13,7 @@ export function PinGuard({
   description?: string
   position?: 'bottom' | 'center'
 }) {
-  const { activeEmployee, isAuthenticated, authenticate } = useSession()
+  const { activeEmployee, isEmployeeActive, authenticate } = useSession()
   const [pin, setPin] = useState('')
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -38,7 +38,7 @@ export function PinGuard({
     }
   }
 
-  if (isAuthenticated) {
+  if (isEmployeeActive) {
     return <>{children}</>
   }
 

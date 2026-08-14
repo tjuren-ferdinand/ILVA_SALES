@@ -81,9 +81,11 @@ export function useSession() {
   const expiresAt = useMemo(() => (data.expiresAt ? new Date(data.expiresAt).getTime() : 0), [data.expiresAt])
   const isExpired = useMemo(() => (expiresAt ? now > expiresAt : true), [expiresAt, now])
 
-  const isAuthenticated = useMemo(
-    () => !!activeStore && !!activeEmployee && data.pinAuth && !isExpired,
-    [activeStore, activeEmployee, data.pinAuth, isExpired]
+  const isAuthenticated = useMemo(() => !!activeStore, [activeStore])
+
+  const isEmployeeActive = useMemo(
+    () => !!activeEmployee && data.pinAuth && !isExpired,
+    [activeEmployee, data.pinAuth, isExpired]
   )
 
   const remainingMs = useMemo(() => Math.max(0, expiresAt - now), [expiresAt, now])
@@ -95,10 +97,8 @@ export function useSession() {
 
   const step = useMemo(() => {
     if (!data.storeId) return 'store'
-    if (!data.employeeId) return 'team'
-    if (!data.pinAuth || isExpired) return 'pin'
     return 'active'
-  }, [data.storeId, data.employeeId, data.pinAuth, isExpired])
+  }, [data.storeId])
 
   const setStore = useCallback((storeId: string) => {
     setSession({ ...sessionData, storeId, employeeId: null, authenticatedAt: null, expiresAt: null, pinAuth: false })
@@ -150,6 +150,7 @@ export function useSession() {
     activeStore: activeStore as Store | undefined,
     activeEmployee: activeEmployee as Employee | undefined,
     isAuthenticated,
+    isEmployeeActive,
     step,
     setStore,
     setEmployee,

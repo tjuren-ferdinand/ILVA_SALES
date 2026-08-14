@@ -20,7 +20,7 @@ export function TopBar() {
   const [showUser, setShowUser] = useState(false)
   const notisRef = useRef<HTMLDivElement>(null)
   const userRef = useRef<HTMLDivElement>(null)
-  const { activeStore, activeEmployee, timeLabel, switchStore, logout } = useSession()
+  const { activeStore, activeEmployee, isEmployeeActive, timeLabel, switchStore, logout } = useSession()
 
   useClickOutside(notisRef, () => setShowNotis(false))
   useClickOutside(userRef, () => setShowUser(false))
@@ -34,8 +34,12 @@ export function TopBar() {
         <div className="flex items-center gap-2 rounded-2xl border border-white/40 bg-white/40 px-3 py-1.5 text-sm text-foreground backdrop-blur-xl">
           <Store className="h-4 w-4 text-muted" strokeWidth={1.5} />
           <span className="font-medium">{activeStore?.name}</span>
-          <span className="text-xs text-muted">· {activeEmployee?.name}</span>
-          <span className="hidden text-xs text-muted lg:inline">· {timeLabel}</span>
+          {isEmployeeActive && (
+            <>
+              <span className="text-xs text-muted">· {activeEmployee?.name}</span>
+              <span className="hidden text-xs text-muted lg:inline">· {timeLabel}</span>
+            </>
+          )}
         </div>
 
         <div ref={notisRef} className="relative">
