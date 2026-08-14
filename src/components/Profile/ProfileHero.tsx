@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useSession } from '../../hooks/useSession'
-import { Clock, LogOut, Sparkles, ArrowLeft, Check, Lock } from 'lucide-react'
+import { Clock, LogOut, Sparkles, Users, ArrowLeft, Check, Lock } from 'lucide-react'
 import type { Employee } from '../../types'
 
 function initials(name: string) {
@@ -34,20 +34,17 @@ function Avatar({ image, name, size = 'md' }: { image?: string; name: string; si
   )
 }
 
-function TeamPicker({ onPick }: { onPick: (id: string) => void }) {
-  const { activeStore } = useSession()
-  if (!activeStore) return null
-
+function TeamGrid({ team, onSelect }: { team: Employee[]; onSelect: (id: string) => void }) {
   return (
-    <div className="space-y-6">
-      <h2 className="text-center text-lg font-semibold text-foreground">Välj säljare</h2>
+    <div className="w-full max-w-2xl space-y-6">
       <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
-        {activeStore.team
+        {team
           .filter((e) => e.active !== false)
-          .map((m) => (
+          .map((m, i) => (
             <button
               key={m.id}
-              onClick={() => onPick(m.id)}
+              onClick={() => onSelect(m.id)}
+              style={{ animationDelay: `${i * 40}ms` }}
               className="profile-card group flex flex-col items-center gap-2 transition hover:scale-105"
               title={m.name}
             >
@@ -132,7 +129,7 @@ function PinPrompt({ employee, onSubmit, onBack }: { employee: Employee; onSubmi
           className="flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-5 py-3 text-sm font-medium text-surface transition hover:bg-foreground/90 disabled:opacity-40"
         >
           <Lock className="h-4 w-4" strokeWidth={1.5} />
-          Logga in
+          Aktivera
         </button>
       </form>
     </div>
@@ -141,11 +138,10 @@ function PinPrompt({ employee, onSubmit, onBack }: { employee: Employee; onSubmi
 
 export function ProfileHero({ variant = 'full' }: { variant?: 'full' | 'compact' }) {
   const { activeEmployee, activeStore, timeLabel, logout, switchEmployee, switchStore, setEmployee, authenticate, isEmployeeActive } = useSession()
-  const compact = variant === 'compact'
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'God morgon' : hour < 17 ? 'God dag' : 'God kväll'
 
-  if (compact) {
+  if (variant === 'compact') {
     return (
       <div className="flex items-center justify-between gap-4">
         {activeEmployee ? (
@@ -216,38 +212,40 @@ export function ProfileHero({ variant = 'full' }: { variant?: 'full' | 'compact'
             </button>
           </div>
         </div>
-      ) : activeEmployee && !isEmployeeActive ? (
+      ) : activeEmployee ? (
         <div className="profile-enter relative z-10 flex flex-col items-center">
-          <Avatar image={activeEmployee.image} name={activeEmployee.name} size="lg" />
-          <h1 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">{activeEmployee.name}</h1>
-          <p className="mt-2 text-sm text-muted">Ange din PIN för att aktivera din profil.</p>
-          <div className="mt-6 w-full max-w-sm">
-            <PinPrompt
-              employee={activeEmployee}
-              onSubmit={authenticate}
-              onBack={switchEmployee}
-            />
-          </div>
+          <PinPrompt employee={activeEmployee} onSubmit={authenticate} onBack={switchEmployee} />
         </div>
       ) : (
         <div className="profile-enter relative z-10 flex flex-col items-center">
-          <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-white/40 bg-white/40 backdrop-blur-xl">
-            <Sparkles className="h-7 w-7 text-foreground/30" strokeWidth={1.5} />
-          </div>
-          {activeStore && (
-            <p className="text-sm text-muted">{activeStore.name}</p>
+          {activeStore ? (
+            <>
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/40 bg-white/40 backdrop-blur-xl">
+                <Users className="h-7 w-7 text-foreground/40" strokeWidth={1.5} />
+              </div>
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">{activeStore.name}</h1>
+              <p className="mt-2 text-sm text-muted">Välj vem du är i {activeStore.city}.</p>
+              <div className="mt-8 w-full">
+                <TeamGrid team={activeStore.team} onSelect={setEmployee} />
+              </div>
+              <div className="mt-6">
+                <button
+                  onClick={switchStore}
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-medium text-muted transition hover:text-foreground"
+                >
+                  Byt butik
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-white/40 bg-white/40 backdrop-blur-xl">
+                <Sparkles className="h-7 w-7 text-foreground/30" strokeWidth={1.5} />
+              </div>
+              <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">Välkommen till ILVA Sales Hub</h1>
+              <p className="mt-3 max-w-md text-base text-muted">Välj butik för att börja.</p>
+            </>
           )}
-          <div className="mt-8 w-full">
-            <TeamPicker onPick={setEmployee} />
-          </div>
-          <div className="mt-6">
-            <button
-              onClick={switchStore}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-medium text-muted transition hover:text-foreground"
-            >
-              Byt butik
-            </button>
-          </div>
         </div>
       )}
     </div>

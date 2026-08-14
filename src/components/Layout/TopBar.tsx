@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Bell, User, LogOut, X, Store, ArrowRightLeft } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Bell, User, LogOut, X, Store, ArrowRightLeft, Users } from 'lucide-react'
 import { GlobalSearch } from '../Search/GlobalSearch'
 import { useSession } from '../../hooks/useSession'
 
@@ -20,10 +21,17 @@ export function TopBar() {
   const [showUser, setShowUser] = useState(false)
   const notisRef = useRef<HTMLDivElement>(null)
   const userRef = useRef<HTMLDivElement>(null)
-  const { activeStore, activeEmployee, isEmployeeActive, timeLabel, switchStore, logout } = useSession()
+  const navigate = useNavigate()
+  const { activeStore, activeEmployee, isEmployeeActive, timeLabel, switchStore, switchEmployee, logout } = useSession()
 
   useClickOutside(notisRef, () => setShowNotis(false))
   useClickOutside(userRef, () => setShowUser(false))
+
+  const handleSwitchEmployee = () => {
+    setShowUser(false)
+    switchEmployee()
+    navigate('/team')
+  }
 
   return (
     <div className="mb-8 hidden items-center justify-between gap-4 md:flex print:hidden">
@@ -34,10 +42,12 @@ export function TopBar() {
         <div className="flex items-center gap-2 rounded-2xl border border-white/40 bg-white/40 px-3 py-1.5 text-sm text-foreground backdrop-blur-xl">
           <Store className="h-4 w-4 text-muted" strokeWidth={1.5} />
           <span className="font-medium">{activeStore?.name}</span>
-          {isEmployeeActive && (
+          {activeEmployee && (
             <>
-              <span className="text-xs text-muted">· {activeEmployee?.name}</span>
-              <span className="hidden text-xs text-muted lg:inline">· {timeLabel}</span>
+              <span className="text-xs text-muted">· {activeEmployee.name}{isEmployeeActive ? '' : ' (låst)'}</span>
+              {isEmployeeActive && (
+                <span className="hidden text-xs text-muted lg:inline">· {timeLabel}</span>
+              )}
             </>
           )}
         </div>
@@ -82,6 +92,13 @@ export function TopBar() {
 
           {showUser && (
             <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-2xl border border-white/40 bg-white/85 p-3 shadow-2xl backdrop-blur-2xl">
+              <button
+                onClick={handleSwitchEmployee}
+                className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-white/50"
+              >
+                <Users className="h-4 w-4" strokeWidth={1.5} />
+                Byt säljare
+              </button>
               <button
                 onClick={() => {
                   setShowUser(false)
