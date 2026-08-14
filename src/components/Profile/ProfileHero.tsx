@@ -1,7 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from '../../hooks/useSession'
 import { Clock, LogOut, Sparkles, Users, ArrowLeft, Check, Lock } from 'lucide-react'
 import type { Employee } from '../../types'
+
+const CATCHY_LINES = [
+  'Hej, vem assisterar jag idag?',
+  'Redo att göra ett kundmöte magiskt?',
+  'Vem tar rodret nu?',
+  'Klicka in dig — kunden väntar.',
+]
 
 function initials(name: string) {
   return name
@@ -138,12 +145,20 @@ function PinPrompt({ employee, onSubmit, onBack }: { employee: Employee; onSubmi
 
 export function ProfileHero({ variant = 'full' }: { variant?: 'full' | 'compact' }) {
   const { activeEmployee, activeStore, timeLabel, logout, switchEmployee, switchStore, setEmployee, authenticate, isEmployeeActive } = useSession()
+  const [catchyLine, setCatchyLine] = useState(CATCHY_LINES[0])
+
+  useEffect(() => {
+    if (!activeEmployee) {
+      setCatchyLine(CATCHY_LINES[Math.floor(Math.random() * CATCHY_LINES.length)])
+    }
+  }, [activeEmployee])
+
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'God morgon' : hour < 17 ? 'God dag' : 'God kväll'
 
   if (variant === 'compact') {
     return (
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col items-center gap-3 py-1 text-center sm:flex-row sm:justify-between sm:text-left">
         {activeEmployee ? (
           <div key={activeEmployee.id} className="profile-enter flex items-center gap-3">
             <Avatar image={activeEmployee.image} name={activeEmployee.name} size="xs" />
@@ -167,7 +182,28 @@ export function ProfileHero({ variant = 'full' }: { variant?: 'full' | 'compact'
           </div>
         ) : (
           <div className="profile-enter min-w-0">
-            <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">Välkommen</h1>
+            <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">{catchyLine}</h1>
+          </div>
+        )}
+
+        {activeStore && (
+          <div className="flex flex-nowrap items-center gap-2 overflow-x-auto pb-1 max-w-full">
+            {activeStore.team
+              .filter((e) => e.active !== false)
+              .map((m, i) => (
+                <button
+                  key={m.id}
+                  onClick={() => setEmployee(m.id)}
+                  style={{ animationDelay: `${i * 40}ms` }}
+                  className="profile-card group flex shrink-0 items-center gap-1.5 rounded-full py-1 pl-1 pr-2.5 transition hover:bg-white/40"
+                  title={m.name}
+                >
+                  <Avatar image={m.image} name={m.name} size="xs" />
+                  <span className="text-xs font-medium text-muted transition group-hover:text-foreground">
+                    {m.name}
+                  </span>
+                </button>
+              ))}
           </div>
         )}
       </div>

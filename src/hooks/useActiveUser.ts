@@ -8,9 +8,9 @@ export type ActiveUser = {
 }
 
 export function useActiveUser() {
-  const { activeEmployee, isEmployeeActive, timeLabel, logout } = useSession()
+  const { activeEmployee, timeLabel, logout } = useSession()
 
-  const user: ActiveUser | null = (activeEmployee && isEmployeeActive)
+  const user: ActiveUser | null = activeEmployee
     ? {
         id: activeEmployee.id,
         name: activeEmployee.name,
