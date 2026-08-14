@@ -140,11 +140,10 @@ export function useSession() {
   const tick = useCallback(() => setNow(Date.now()), [])
 
   useEffect(() => {
-    if (isAuthenticated) return
-    if (data.employeeId && isExpired) {
-      setSession({ ...sessionData, employeeId: null, authenticatedAt: null, expiresAt: null, pinAuth: false })
+    if (data.pinAuth && isExpired) {
+      setSession({ ...sessionData, pinAuth: false, authenticatedAt: null, expiresAt: null })
     }
-  }, [isAuthenticated, isExpired, data.employeeId])
+  }, [data.pinAuth, isExpired])
 
   return {
     stores: activeStores,
