@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 import { activeStores, getStoreById } from '../data/stores'
 import type { Employee, Store } from '../types'
 
@@ -13,13 +13,23 @@ type SessionData = {
   pinAuth: boolean
 }
 
-function loadSession(): SessionData | null {
+const emptySession: SessionData = {
+  storeId: null,
+  employeeId: null,
+  authenticatedAt: null,
+  expiresAt: null,
+  pinAuth: false,
+}
+
+function loadSession(): SessionData {
   try {
     const raw = localStorage.getItem(SESSION_KEY)
-    if (!raw) return null
-    return JSON.parse(raw) as SessionData
+    if (!raw) return emptySession
+    const parsed = JSON.parse(raw) as SessionData
+    if (parsed.expiresAt && new Date(parsed.expiresAt).getTime() < Date.now()) return emptySession
+    return parsed
   } catch {
-    return null
+    return emptySession
   }
 }
 
@@ -31,17 +41,30 @@ function clearSession() {
   localStorage.removeItem(SESSION_KEY)
 }
 
+let sessionData = loadSession()
+const listeners = new Set<() => void>()
+
+function emit() {
+  listeners.forEach((fn) => fn())
+}
+
+function setSession(next: SessionData) {
+  sessionData = next
+  saveSession(next)
+  emit()
+}
+
+function getSnapshot(): SessionData {
+  return sessionData
+}
+
+function subscribe(callback: () => void) {
+  listeners.add(callback)
+  return () => listeners.delete(callback)
+}
+
 export function useSession() {
-  const [session, setSession] = useState<SessionData>(
-    () =>
-      loadSession() ?? {
-        storeId: null,
-        employeeId: null,
-        authenticatedAt: null,
-        expiresAt: null,
-        pinAuth: false,
-      }
-  )
+  const data = useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
   const [now, setNow] = useState(Date.now())
 
   useEffect(() => {
@@ -49,18 +72,18 @@ export function useSession() {
     return () => clearInterval(t)
   }, [])
 
-  const activeStore = useMemo(() => (session.storeId ? getStoreById(session.storeId) : undefined), [session.storeId])
+  const activeStore = useMemo(() => (data.storeId ? getStoreById(data.storeId) : undefined), [data.storeId])
   const activeEmployee = useMemo(
-    () => activeStore?.team.find((e) => e.id === session.employeeId),
-    [activeStore, session.employeeId]
+    () => activeStore?.team.find((e) => e.id === data.employeeId),
+    [activeStore, data.employeeId]
   )
 
-  const expiresAt = useMemo(() => (session.expiresAt ? new Date(session.expiresAt).getTime() : 0), [session.expiresAt])
+  const expiresAt = useMemo(() => (data.expiresAt ? new Date(data.expiresAt).getTime() : 0), [data.expiresAt])
   const isExpired = useMemo(() => (expiresAt ? now > expiresAt : true), [expiresAt, now])
 
   const isAuthenticated = useMemo(
-    () => !!activeStore && !!activeEmployee && session.pinAuth && !isExpired,
-    [activeStore, activeEmployee, session.pinAuth, isExpired]
+    () => !!activeStore && !!activeEmployee && data.pinAuth && !isExpired,
+    [activeStore, activeEmployee, data.pinAuth, isExpired]
   )
 
   const remainingMs = useMemo(() => Math.max(0, expiresAt - now), [expiresAt, now])
@@ -71,84 +94,57 @@ export function useSession() {
   }, [remainingMs])
 
   const step = useMemo(() => {
-    if (!session.storeId) return 'store'
-    if (!session.employeeId) return 'team'
-    if (!session.pinAuth || isExpired) return 'pin'
+    if (!data.storeId) return 'store'
+    if (!data.employeeId) return 'team'
+    if (!data.pinAuth || isExpired) return 'pin'
     return 'active'
-  }, [session.storeId, session.employeeId, session.pinAuth, isExpired])
+  }, [data.storeId, data.employeeId, data.pinAuth, isExpired])
 
   const setStore = useCallback((storeId: string) => {
-    const next = { storeId, employeeId: null, authenticatedAt: null, expiresAt: null, pinAuth: false }
-    setSession(next)
-    saveSession(next)
+    setSession({ ...sessionData, storeId, employeeId: null, authenticatedAt: null, expiresAt: null, pinAuth: false })
   }, [])
 
   const setEmployee = useCallback((employeeId: string) => {
-    setSession((s) => {
-      const next = { ...s, employeeId, authenticatedAt: null, expiresAt: null, pinAuth: false }
-      saveSession(next)
-      return next
-    })
+    setSession({ ...sessionData, employeeId, authenticatedAt: null, expiresAt: null, pinAuth: false })
   }, [])
 
-  const authenticate = useCallback(
-    (pin: string) => {
-      if (!activeEmployee) return false
-      if (activeEmployee.pin !== pin) return false
-      const at = Date.now()
-      const expires = at + SESSION_MS
-      const next: SessionData = {
-        ...session,
-        pinAuth: true,
-        authenticatedAt: new Date(at).toISOString(),
-        expiresAt: new Date(expires).toISOString(),
-      }
-      setSession(next)
-      saveSession(next)
-      return true
-    },
-    [activeEmployee, session]
-  )
+  const authenticate = useCallback((pin: string) => {
+    const store = sessionData.storeId ? getStoreById(sessionData.storeId) : undefined
+    const employee = store?.team.find((e) => e.id === sessionData.employeeId)
+    if (!employee || employee.pin !== pin) return false
+    const at = Date.now()
+    const expires = at + SESSION_MS
+    const next: SessionData = {
+      ...sessionData,
+      pinAuth: true,
+      authenticatedAt: new Date(at).toISOString(),
+      expiresAt: new Date(expires).toISOString(),
+    }
+    setSession(next)
+    return true
+  }, [])
 
   const logout = useCallback(() => {
     clearSession()
-    setSession({
-      storeId: null,
-      employeeId: null,
-      authenticatedAt: null,
-      expiresAt: null,
-      pinAuth: false,
-    })
+    setSession(emptySession)
   }, [])
 
   const switchStore = useCallback(() => {
-    setSession((s) => {
-      const next = { ...s, employeeId: null, authenticatedAt: null, expiresAt: null, pinAuth: false }
-      saveSession(next)
-      return next
-    })
+    setSession({ ...sessionData, employeeId: null, authenticatedAt: null, expiresAt: null, pinAuth: false })
   }, [])
 
   const switchEmployee = useCallback(() => {
-    setSession((s) => {
-      const next = { ...s, employeeId: null, authenticatedAt: null, expiresAt: null, pinAuth: false }
-      saveSession(next)
-      return next
-    })
+    setSession({ ...sessionData, employeeId: null, authenticatedAt: null, expiresAt: null, pinAuth: false })
   }, [])
 
   const tick = useCallback(() => setNow(Date.now()), [])
 
   useEffect(() => {
     if (isAuthenticated) return
-    if (session.employeeId && isExpired) {
-      setSession((s) => {
-        const next = { ...s, employeeId: null, authenticatedAt: null, expiresAt: null, pinAuth: false }
-        saveSession(next)
-        return next
-      })
+    if (data.employeeId && isExpired) {
+      setSession({ ...sessionData, employeeId: null, authenticatedAt: null, expiresAt: null, pinAuth: false })
     }
-  }, [isAuthenticated, isExpired, session.employeeId])
+  }, [isAuthenticated, isExpired, data.employeeId])
 
   return {
     stores: activeStores,
