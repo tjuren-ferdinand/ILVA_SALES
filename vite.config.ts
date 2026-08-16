@@ -171,7 +171,7 @@ export default defineConfig(({ mode }) => {
               const result = await createGeminiReply({
                 messages: body.messages,
                 apiKey: env.GEMINI_API_KEY,
-                model: body.model ?? 'gemini-3.5-flash',
+                model: body.model,
                 tools: chatTools,
                 toolExecutor: chatToolExecutor,
               })
