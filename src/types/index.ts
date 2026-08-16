@@ -134,6 +134,7 @@ export type Store = {
   city: string
   code: string
   active: boolean
+  storePin?: string
   team: Employee[]
   phone?: string
   address?: string

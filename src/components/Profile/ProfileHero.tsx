@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from '../../hooks/useSession'
-import { Clock, LogOut, Sparkles, Users, ArrowLeft, Check, Lock } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Clock, LogOut, Sparkles, Users, Check } from 'lucide-react'
 import type { Employee } from '../../types'
 
 const CATCHY_LINES = [
@@ -72,79 +73,9 @@ function TeamGrid({ team, onSelect }: { team: Employee[]; onSelect: (id: string)
   )
 }
 
-function PinPrompt({ employee, onSubmit, onBack }: { employee: Employee; onSubmit: (pin: string) => boolean; onBack: () => void }) {
-  const [pin, setPin] = useState('')
-  const [error, setError] = useState<string | null>(null)
-
-  const handleSubmit = (e?: React.FormEvent) => {
-    e?.preventDefault()
-    if (pin.length !== 4) {
-      setError('Ange 4 siffror')
-      return
-    }
-    if (!onSubmit(pin)) {
-      setError('Fel PIN')
-      setPin('')
-    }
-  }
-
-  return (
-    <div className="w-full max-w-sm space-y-6">
-      <div className="text-center">
-        <button onClick={onBack} className="mb-4 inline-flex items-center gap-1 text-xs text-muted transition hover:text-foreground">
-          <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} /> Tillbaka
-        </button>
-        <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl border border-white/40 bg-white/40 backdrop-blur-xl">
-          <Avatar image={employee.image} name={employee.name} size="lg" />
-        </div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">{employee.name}</h1>
-        <p className="mt-2 text-sm text-muted">Ange din 4-siffriga PIN.</p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex justify-center gap-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className={`h-4 w-4 rounded-full transition ${
-                i < pin.length ? 'bg-foreground' : 'bg-foreground/20'
-              }`}
-            />
-          ))}
-        </div>
-
-        <input
-          type="password"
-          inputMode="numeric"
-          pattern="\d*"
-          maxLength={4}
-          value={pin}
-          onChange={(e) => {
-            setPin(e.target.value.replace(/\D/g, '').slice(0, 4))
-            setError(null)
-          }}
-          className="sr-only"
-          aria-label="PIN-kod"
-          autoFocus
-        />
-
-        {error && <p className="text-center text-xs text-red-600">{error}</p>}
-
-        <button
-          type="submit"
-          disabled={pin.length !== 4}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-5 py-3 text-sm font-medium text-surface transition hover:bg-foreground/90 disabled:opacity-40"
-        >
-          <Lock className="h-4 w-4" strokeWidth={1.5} />
-          Aktivera
-        </button>
-      </form>
-    </div>
-  )
-}
-
 export function ProfileHero({ variant = 'full' }: { variant?: 'full' | 'compact' }) {
-  const { activeEmployee, activeStore, timeLabel, logout, switchEmployee, switchStore, setEmployee, authenticate, isEmployeeActive } = useSession()
+  const { activeEmployee, activeStore, timeLabel, logout, switchEmployee, switchStore, setEmployee, isEmployeeActive } = useSession()
+  const navigate = useNavigate()
   const [catchyLine, setCatchyLine] = useState(CATCHY_LINES[0])
 
   useEffect(() => {
@@ -193,7 +124,10 @@ export function ProfileHero({ variant = 'full' }: { variant?: 'full' | 'compact'
               .map((m, i) => (
                 <button
                   key={m.id}
-                  onClick={() => setEmployee(m.id)}
+                  onClick={() => {
+                    setEmployee(m.id)
+                    navigate('/team')
+                  }}
                   style={{ animationDelay: `${i * 40}ms` }}
                   className="profile-card group flex shrink-0 items-center gap-1.5 rounded-full py-1 pl-1 pr-2.5 transition hover:bg-white/40"
                   title={m.name}
@@ -215,17 +149,21 @@ export function ProfileHero({ variant = 'full' }: { variant?: 'full' | 'compact'
       <div className="pointer-events-none absolute -left-16 -top-16 h-64 w-64 rounded-full bg-foreground/[0.03] blur-3xl" />
       <div className="pointer-events-none absolute -bottom-16 -right-16 h-72 w-72 rounded-full bg-foreground/[0.04] blur-3xl" />
 
-      {activeEmployee && isEmployeeActive ? (
+      {activeEmployee ? (
         <div key={activeEmployee.id} className="profile-enter relative z-10 flex flex-col items-center">
           <Avatar image={activeEmployee.image} name={activeEmployee.name} size="xl" />
           <p className="mt-6 text-sm font-medium uppercase tracking-[0.2em] text-muted">{greeting}</p>
           <h1 className="mt-2 text-4xl font-semibold tracking-tight text-foreground md:text-5xl">{activeEmployee.name}</h1>
           <p className="mt-3 text-base text-muted">{activeEmployee.role}</p>
           {activeStore && <p className="mt-1 text-sm text-muted">{activeStore.name}</p>}
-          <div className="mt-6 flex items-center gap-2 rounded-full border border-white/50 bg-white/50 px-4 py-2 text-sm text-muted backdrop-blur-xl">
-            <Clock className="h-4 w-4" strokeWidth={1.5} />
-            Aktiv · {timeLabel}
-          </div>
+          {isEmployeeActive ? (
+            <div className="mt-6 flex items-center gap-2 rounded-full border border-white/50 bg-white/50 px-4 py-2 text-sm text-muted backdrop-blur-xl">
+              <Clock className="h-4 w-4" strokeWidth={1.5} />
+              Aktiv · {timeLabel}
+            </div>
+          ) : (
+            <div className="mt-6 text-sm text-muted">Inte aktiverad</div>
+          )}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
             <button
               onClick={switchEmployee}
@@ -247,10 +185,6 @@ export function ProfileHero({ variant = 'full' }: { variant?: 'full' | 'compact'
               Logga ut
             </button>
           </div>
-        </div>
-      ) : activeEmployee ? (
-        <div className="profile-enter relative z-10 flex flex-col items-center">
-          <PinPrompt employee={activeEmployee} onSubmit={authenticate} onBack={switchEmployee} />
         </div>
       ) : (
         <div className="profile-enter relative z-10 flex flex-col items-center">

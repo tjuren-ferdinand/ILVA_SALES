@@ -3,7 +3,7 @@ import type { Connect } from 'vite'
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { searchIlvaProducts, fetchIlvaProduct, getProductVariants } from './src/server/ilvaScraper.ts'
-import { createGroqReply, type ToolDefinition, type ToolExecutor } from './src/server/groqChat.ts'
+import { createGeminiReply, type ToolDefinition, type ToolExecutor } from './src/server/geminiChat.ts'
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' })
@@ -37,8 +37,7 @@ function readBody(req: IncomingMessage): Promise<unknown> {
 
 export default defineConfig(({ mode }) => {
   const env = {
-    GROQ_API_KEY: loadEnv(mode, process.cwd(), 'GROQ_').GROQ_API_KEY ?? process.env.GROQ_API_KEY,
-    GROQ_MODEL: loadEnv(mode, process.cwd(), 'GROQ_').GROQ_MODEL ?? process.env.GROQ_MODEL,
+    GEMINI_API_KEY: loadEnv(mode, process.cwd(), 'GEMINI_').GEMINI_API_KEY ?? process.env.GEMINI_API_KEY,
   }
 
   return {
@@ -169,10 +168,10 @@ export default defineConfig(({ mode }) => {
             }
             try {
               const body = (await readBody(req)) as { messages?: unknown; model?: string }
-              const result = await createGroqReply({
+              const result = await createGeminiReply({
                 messages: body.messages,
-                apiKey: env.GROQ_API_KEY,
-                model: body.model ?? env.GROQ_MODEL,
+                apiKey: env.GEMINI_API_KEY,
+                model: body.model ?? 'gemini-3.5-flash',
                 tools: chatTools,
                 toolExecutor: chatToolExecutor,
               })

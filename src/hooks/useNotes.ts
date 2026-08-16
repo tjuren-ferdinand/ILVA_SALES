@@ -4,6 +4,7 @@ export type Note = {
   id: string
   memberId: string
   text: string
+  customerName?: string
   createdAt: number
   done: boolean
 }
@@ -31,11 +32,12 @@ export function useNotes(memberId?: string) {
     setNotes(readAll())
   }, [])
 
-  const addNote = useCallback((mId: string, text: string) => {
+  const addNote = useCallback((mId: string, text: string, customerName?: string) => {
     const note: Note = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       memberId: mId,
       text,
+      customerName,
       createdAt: Date.now(),
       done: false,
     }

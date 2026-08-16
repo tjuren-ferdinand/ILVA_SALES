@@ -9,11 +9,10 @@ import { updates } from '../data/mockData'
 import { ProfileHero } from '../components/Profile/ProfileHero'
 import type { UpdateItem } from '../types'
 
-const mainPaths = ['/offert', '/delivery', '/discounts', '/returns']
+const mainPaths = ['/offert', '/delivery', '/returns']
 
 const quickItems = [
   { to: '/products', title: 'Sök ILVA-produkter', description: 'Riktig produktsökning för kunden' },
-  { to: '/discounts', title: 'Maxrabatter', description: 'Aktuella gränser' },
   { to: '/delivery', title: 'Leverans per postnummer', description: 'Ange kundens postnummer' },
   { to: '/returns', title: 'Returguide', description: 'Retur, reklamation & öppet köp' },
 ]
@@ -21,7 +20,6 @@ const quickItems = [
 const functionDescriptions: Record<string, string> = {
   Offert: 'Skapa & skicka till kund',
   Leverans: 'Alternativ & priser',
-  Rabatter: 'Max rabatt per kategori',
   Returer: 'Retur, reklamation & öppet köp',
 }
 

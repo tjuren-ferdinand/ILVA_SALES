@@ -1,15 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { PageHeader } from '../components/ui/PageHeader'
+import { PinGuard } from '../components/PinGuard'
+import { useSession } from '../hooks/useSession'
 import { useActiveUser } from '../hooks/useActiveUser'
 import { useNotes } from '../hooks/useNotes'
-import { Check, Plus, Trash2 } from 'lucide-react'
-
-type TeamMember = {
-  id: string
-  name: string
-  role: string
-  image?: string
-}
+import { Check, Plus, Trash2, User } from 'lucide-react'
 
 function initials(name: string) {
   return name
@@ -55,34 +50,20 @@ function formatDate(ts: number) {
 }
 
 export function Notes() {
-  const [members, setMembers] = useState<TeamMember[]>([])
   const { user } = useActiveUser()
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const { activeStore, activeEmployee, setEmployee } = useSession()
   const [draft, setDraft] = useState('')
+  const [customerDraft, setCustomerDraft] = useState('')
 
-  useEffect(() => {
-    fetch('/team/team.json')
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data: TeamMember[]) => setMembers(data))
-      .catch(() => setMembers([]))
-  }, [])
-
-  useEffect(() => {
-    if (!selectedId && user) setSelectedId(user.id)
-  }, [user, selectedId])
-
-  useEffect(() => {
-    if (!selectedId && members.length > 0) setSelectedId(members[0].id)
-  }, [members, selectedId])
-
-  const selected = members.find((m) => m.id === selectedId)
-  const { notes, addNote, toggleNote, removeNote } = useNotes(selectedId ?? undefined)
+  const members = activeStore?.team.filter((e) => e.active !== false) ?? []
+  const { notes, addNote, toggleNote, removeNote } = useNotes(activeEmployee?.id)
 
   const submit = () => {
     const text = draft.trim()
-    if (!text || !selectedId) return
-    addNote(selectedId, text)
+    if (!text || !activeEmployee) return
+    addNote(activeEmployee.id, text, customerDraft.trim() || undefined)
     setDraft('')
+    setCustomerDraft('')
   }
 
   return (
@@ -96,46 +77,57 @@ export function Notes() {
         {members.map((m) => (
           <button
             key={m.id}
-            onClick={() => setSelectedId(m.id)}
+            onClick={() => setEmployee(m.id)}
             className={`flex items-center gap-2 rounded-full py-1 pl-1 pr-3 transition ${
-              selectedId === m.id ? 'bg-foreground/5' : 'hover:bg-foreground/5'
+              activeEmployee?.id === m.id ? 'bg-foreground/5' : 'hover:bg-foreground/5'
             }`}
           >
-            <Avatar image={m.image} name={m.name} active={selectedId === m.id} />
-            <span className={`text-sm font-medium ${selectedId === m.id ? 'text-foreground' : 'text-muted'}`}>
+            <Avatar image={m.image} name={m.name} active={activeEmployee?.id === m.id} />
+            <span className={`text-sm font-medium ${activeEmployee?.id === m.id ? 'text-foreground' : 'text-muted'}`}>
               {m.name}
             </span>
           </button>
         ))}
       </div>
 
-      {selected && (
+      <PinGuard>
         <div className="surface p-5">
           <div className="flex items-center gap-3">
-            <Avatar image={selected.image} name={selected.name} active />
+            <Avatar image={user?.image} name={user?.name ?? ''} active />
             <div>
-              <h2 className="text-base font-semibold text-foreground">{selected.name}s anteckningar</h2>
+              <h2 className="text-base font-semibold text-foreground">{user?.name}s anteckningar</h2>
               <p className="text-xs text-muted">{notes.length} st sparade</p>
             </div>
           </div>
 
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 space-y-3">
             <input
               type="text"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && submit()}
               placeholder="Ring Anne om kuddfodral 15/8…"
-              className="flex-1 rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none transition focus:border-foreground/30"
+              className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none transition focus:border-foreground/30"
             />
-            <button
-              onClick={submit}
-              disabled={!draft.trim()}
-              className="flex items-center gap-1.5 rounded-xl bg-foreground px-4 py-2.5 text-sm font-medium text-surface transition disabled:opacity-30"
-            >
-              <Plus className="h-4 w-4" strokeWidth={1.5} />
-              Lägg till
-            </button>
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 text-muted" strokeWidth={1.5} />
+              <input
+                type="text"
+                value={customerDraft}
+                onChange={(e) => setCustomerDraft(e.target.value)}
+                placeholder="Kundnamn (valfritt)…"
+                className="flex-1 rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none transition focus:border-foreground/30"
+              />
+              <button
+                onClick={submit}
+                disabled={!draft.trim()}
+                className="flex items-center gap-1.5 rounded-xl bg-foreground px-4 py-2.5 text-sm font-medium text-surface transition disabled:opacity-30"
+              >
+                <Plus className="h-4 w-4" strokeWidth={1.5} />
+                Lägg till
+              </button>
+            </div>
+            <p className="text-xs text-muted">Lämna kundnamnet tomt för en privat anteckning.</p>
           </div>
 
           <div className="mt-5 space-y-2">
@@ -157,6 +149,11 @@ export function Notes() {
                   </button>
                   <div className="min-w-0 flex-1">
                     <p className={`text-sm ${n.done ? 'text-muted line-through' : 'text-foreground'}`}>{n.text}</p>
+                    {n.customerName && (
+                      <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted">
+                        <User className="h-3 w-3" strokeWidth={1.5} /> {n.customerName}
+                      </p>
+                    )}
                     <p className="mt-0.5 text-[11px] text-muted">{formatDate(n.createdAt)}</p>
                   </div>
                   <button
@@ -171,7 +168,7 @@ export function Notes() {
             )}
           </div>
         </div>
-      )}
+      </PinGuard>
     </div>
   )
 }

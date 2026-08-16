@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
-import { activeStores, getStoreById } from '../data/stores'
+import { stores as allStores, getStoreById } from '../data/stores'
 import type { Employee, Store } from '../types'
 
 const SESSION_KEY = 'ilva-session'
@@ -146,7 +146,7 @@ export function useSession() {
   }, [data.pinAuth, isExpired])
 
   return {
-    stores: activeStores,
+    stores: allStores,
     activeStore: activeStore as Store | undefined,
     activeEmployee: activeEmployee as Employee | undefined,
     isAuthenticated,
