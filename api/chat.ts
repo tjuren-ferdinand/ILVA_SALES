@@ -1,5 +1,7 @@
 /// <reference types="node" />
 
+const GEMINI_API = 'https://generativelanguage.googleapis.com/v1beta/models'
+
 type ChatMessage = {
   role: 'system' | 'user' | 'assistant'
   content: string
@@ -31,15 +33,20 @@ function isChatMessageArray(value: unknown): value is ChatMessage[] {
 }
 
 function toGeminiContents(messages: ChatMessage[]): unknown[] {
-  const contents: unknown[] = []
-  for (const m of messages) {
-    if (m.role === 'system') continue
-    contents.push({
+  return messages
+    .filter((m) => m.role !== 'system')
+    .map((m) => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: m.content }],
-    })
-  }
-  return contents
+    }))
+}
+
+function mapGeminiStatus(status: number): number {
+  if (status === 429) return 429
+  if (status === 401 || status === 403) return 401
+  if (status >= 500) return 502
+  if (status >= 400) return 400
+  return 500
 }
 
 export default async function handler(req: ChatRequest, res: ChatResponse) {
@@ -65,21 +72,49 @@ export default async function handler(req: ChatRequest, res: ChatResponse) {
     const systemMessages = messages.filter((m) => m.role === 'system')
     const systemInstruction = systemMessages.length > 0 ? systemMessages.map((m) => m.content).join('\n\n') : undefined
     const contents = toGeminiContents(messages)
+    const model = body.model ?? 'gemini-1.5-flash'
+    const url = `${GEMINI_API}/${model}:generateContent?key=${apiKey}`
 
-    const { GoogleGenAI } = await import('@google/genai')
-    const ai = new GoogleGenAI({ apiKey } as any)
-    const result = (await (ai as any).models.generateContent({
-      model: body.model ?? 'gemini-1.5-flash',
-      contents,
-      config: {
-        systemInstruction,
-        temperature: 0.4,
-        maxOutputTokens: 1200,
-      },
-    } as any)) as any
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents,
+        ...(systemInstruction
+          ? { systemInstruction: { role: 'system', parts: [{ text: systemInstruction }] } }
+          : {}),
+        generationConfig: {
+          temperature: 0.4,
+          maxOutputTokens: 1200,
+        },
+      }),
+    })
 
-    const text = typeof result?.text === 'string' ? (result.text as string).trim() : undefined
+    if (!response.ok) {
+      const text = await response.text().catch(() => 'Okänt fel')
+      let message = 'Kunde inte nå Google Gemini. Försök igen.'
+      try {
+        const parsed = JSON.parse(text) as { error?: { message?: string } }
+        if (parsed.error?.message) message = parsed.error.message
+      } catch {
+        // ignore
+      }
+      console.error('Gemini API error:', response.status, text)
+      res.status(mapGeminiStatus(response.status)).json({ error: message })
+      return
+    }
 
+    const data = (await response.json()) as {
+      candidates?: { content?: { parts?: { text?: string }[] } }[]
+      error?: { message?: string }
+    }
+
+    if (data.error?.message) {
+      res.status(500).json({ error: data.error.message })
+      return
+    }
+
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
     if (!text) {
       res.status(200).json({ reply: 'Jag har inget svar just nu.' })
       return
