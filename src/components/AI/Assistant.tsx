@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Sparkles, Send, X, MessageSquare, AlertCircle } from 'lucide-react'
-import { sendChatMessage, type ChatMessage, type PageContext } from '../../lib/ai/groq'
+import { sendChatMessage, type ChatMessage, type PageContext } from '../../lib/ai/gemini'
 import { useSession } from '../../hooks/useSession'
 import { topNav, bottomNav } from '../../data/navItems'
 

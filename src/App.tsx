@@ -4,6 +4,7 @@ import { Home } from './pages/Home'
 import { SearchPage } from './pages/SearchPage'
 import { Delivery } from './pages/Delivery'
 import { DeliveryDetail } from './pages/DeliveryDetail'
+import { Discounts } from './pages/Discounts'
 import { Orders } from './pages/Orders'
 import { Returns } from './pages/Returns'
 import { Payment } from './pages/Payment'
@@ -28,6 +29,7 @@ function App() {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/delivery" element={<Delivery />} />
         <Route path="/delivery/:id" element={<DeliveryDetail />} />
+        <Route path="/discounts" element={<Discounts />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/returns" element={<Returns />} />
         <Route path="/payment" element={<Payment />} />
