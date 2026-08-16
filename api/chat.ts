@@ -1,7 +1,11 @@
 /// <reference types="node" />
 
-import { createGeminiReply, type ToolDefinition, type ToolExecutor } from '../src/server/geminiChat'
-import { searchIlvaProducts } from '../src/server/ilvaScraper'
+import { GoogleGenAI } from '@google/genai'
+
+type ChatMessage = {
+  role: 'system' | 'user' | 'assistant'
+  content: string
+}
 
 type ChatRequest = {
   method?: string
@@ -15,52 +19,29 @@ type ChatResponse = {
   status: (code: number) => { json: (body: unknown) => void }
 }
 
-const chatTools: ToolDefinition[] = [
-  {
-    type: 'function',
-    function: {
-      name: 'search_ilva_products',
-      description: 'Sök efter produkter på ilva.se. Returnerar namn, pris, artikelnummer, kategori, bild-URL och länk för varje produkt.',
-      parameters: {
-        type: 'object',
-        properties: {
-          query: {
-            type: 'string',
-            description: 'Sökfråga, t.ex. "soffa", "matbord", "Cleveland", "fåtölj". Använd svenska eller danska möbeltermer.',
-          },
-          limit: {
-            type: 'number',
-            description: 'Max antal produkter att returnera (1-20). Standard är 8.',
-          },
-        },
-        required: ['query'],
-      },
-    },
-  },
-]
+function isChatMessageArray(value: unknown): value is ChatMessage[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (m) =>
+        typeof m === 'object' &&
+        m !== null &&
+        typeof (m as { role?: unknown }).role === 'string' &&
+        typeof (m as { content?: unknown }).content === 'string'
+    )
+  )
+}
 
-const chatToolExecutor: ToolExecutor = async (name, args) => {
-  if (name === 'search_ilva_products') {
-    const query = String(args.query ?? '').trim()
-    if (!query) return 'Ingen sökfråga angiven.'
-    const limit = Math.min(Math.max(Number(args.limit ?? 8), 1), 20)
-    try {
-      const products = await searchIlvaProducts(query, limit)
-      if (products.length === 0) return `Inga produkter hittades för "${query}".`
-      return JSON.stringify(products.map((p) => ({
-        namn: p.name,
-        pris: p.ordinaryPrice,
-        artikelnummer: p.articleNumber,
-        kategori: p.category,
-        serie: p.series,
-        bild: p.image,
-        url: p.url,
-      })))
-    } catch {
-      return 'Kunde inte söka ILVA-produkter just nu.'
-    }
+function toGeminiContents(messages: ChatMessage[]): unknown[] {
+  const contents: unknown[] = []
+  for (const m of messages) {
+    if (m.role === 'system') continue
+    contents.push({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }],
+    })
   }
-  return `Okänd funktion: ${name}`
+  return contents
 }
 
 export default async function handler(req: ChatRequest, res: ChatResponse) {
@@ -71,15 +52,41 @@ export default async function handler(req: ChatRequest, res: ChatResponse) {
 
   try {
     const body = req.body ?? {}
-    const result = await createGeminiReply({
-      messages: body.messages,
-      apiKey: process.env.GEMINI_API_KEY,
-      model: body.model,
-      tools: chatTools,
-      toolExecutor: chatToolExecutor,
-    })
+    const messages = isChatMessageArray(body.messages) ? body.messages : []
+    if (messages.length === 0) {
+      res.status(400).json({ error: 'Ogiltigt meddelandeformat.' })
+      return
+    }
 
-    res.status(result.status).json(result.error ? { error: result.error } : { reply: result.reply })
+    const apiKey = process.env.GEMINI_API_KEY
+    if (!apiKey) {
+      res.status(500).json({ error: 'Servern saknar API-nyckel.' })
+      return
+    }
+
+    const systemMessages = messages.filter((m) => m.role === 'system')
+    const systemInstruction = systemMessages.length > 0 ? systemMessages.map((m) => m.content).join('\n\n') : undefined
+    const contents = toGeminiContents(messages)
+
+    const ai = new GoogleGenAI({ apiKey } as any)
+    const result = (await (ai as any).models.generateContent({
+      model: body.model ?? 'gemini-1.5-flash',
+      contents,
+      config: {
+        systemInstruction,
+        temperature: 0.4,
+        maxOutputTokens: 1200,
+      },
+    } as any)) as any
+
+    const text = typeof result?.text === 'string' ? (result.text as string).trim() : undefined
+
+    if (!text) {
+      res.status(200).json({ reply: 'Jag har inget svar just nu.' })
+      return
+    }
+
+    res.status(200).json({ reply: text })
   } catch (err) {
     console.error('Chat handler error:', err)
     res.status(500).json({ error: 'Internt serverfel.' })
