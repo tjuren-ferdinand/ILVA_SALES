@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Building2, ArrowRight, Store as StoreIcon, Lock, ArrowLeft } from 'lucide-react'
 import { useSession } from '../../hooks/useSession'
 import type { Store } from '../../types'
@@ -26,6 +26,7 @@ function StorePinPrompt({
 }) {
   const [pin, setPin] = useState('')
   const [lengthError, setLengthError] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault()
@@ -36,6 +37,10 @@ function StorePinPrompt({
     setLengthError(null)
     onSubmit(pin)
   }
+
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
 
   return (
     <div className="w-full max-w-sm space-y-6">
@@ -54,7 +59,11 @@ function StorePinPrompt({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex justify-center gap-2">
+        <div
+          className="flex cursor-text justify-center gap-2"
+          onClick={() => inputRef.current?.focus()}
+          onTouchStart={() => inputRef.current?.focus()}
+        >
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
@@ -66,10 +75,12 @@ function StorePinPrompt({
         </div>
 
         <input
-          type="password"
+          ref={inputRef}
+          type="text"
           inputMode="numeric"
           pattern="\d*"
           maxLength={4}
+          autoComplete="off"
           value={pin}
           onChange={(e) => {
             setPin(e.target.value.replace(/\D/g, '').slice(0, 4))
