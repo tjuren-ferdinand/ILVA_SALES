@@ -27,7 +27,7 @@ export type ToolDefinition = {
 
 export type ToolExecutor = (name: string, args: Record<string, unknown>) => Promise<string>
 
-export const DEFAULT_MODEL = 'gemini-1.5-flash'
+export const DEFAULT_MODEL = 'gemini-3.7-flash'
 
 function isChatMessageArray(value: unknown): value is ChatMessage[] {
   return (
