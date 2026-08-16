@@ -1,7 +1,5 @@
 /// <reference types="node" />
 
-import { GoogleGenAI } from '@google/genai'
-
 type ChatMessage = {
   role: 'system' | 'user' | 'assistant'
   content: string
@@ -68,6 +66,7 @@ export default async function handler(req: ChatRequest, res: ChatResponse) {
     const systemInstruction = systemMessages.length > 0 ? systemMessages.map((m) => m.content).join('\n\n') : undefined
     const contents = toGeminiContents(messages)
 
+    const { GoogleGenAI } = await import('@google/genai')
     const ai = new GoogleGenAI({ apiKey } as any)
     const result = (await (ai as any).models.generateContent({
       model: body.model ?? 'gemini-1.5-flash',
@@ -89,6 +88,7 @@ export default async function handler(req: ChatRequest, res: ChatResponse) {
     res.status(200).json({ reply: text })
   } catch (err) {
     console.error('Chat handler error:', err)
-    res.status(500).json({ error: 'Internt serverfel.' })
+    const message = err instanceof Error ? err.message : 'Internt serverfel.'
+    res.status(500).json({ error: message })
   }
 }
