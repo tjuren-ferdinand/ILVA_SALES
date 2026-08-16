@@ -72,7 +72,7 @@ export default async function handler(req: ChatRequest, res: ChatResponse) {
     const systemMessages = messages.filter((m) => m.role === 'system')
     const systemInstruction = systemMessages.length > 0 ? systemMessages.map((m) => m.content).join('\n\n') : undefined
     const contents = toGeminiContents(messages)
-    const model = body.model ?? 'gemini-1.5-flash-latest'
+    const model = body.model ?? 'gemini-1.5-flash'
     const url = `${GEMINI_API}/${model}:generateContent`
 
     const response = await fetch(url, {
