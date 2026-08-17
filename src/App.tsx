@@ -19,6 +19,7 @@ import { Team } from './pages/Team'
 import { Notes } from './pages/Notes'
 import { OfferPage } from './features/offers/pages/OfferPage'
 import { NotFound } from './pages/NotFound'
+import { PlaceholderPage } from './pages/PlaceholderPage'
 
 function App() {
   return (
@@ -42,6 +43,11 @@ function App() {
         <Route path="/team" element={<Team />} />
         <Route path="/notes" element={<Notes />} />
         <Route path="/offert" element={<OfferPage />} />
+        <Route path="/customers" element={<PlaceholderPage title="Kunder" />} />
+        <Route path="/prices" element={<PlaceholderPage title="Priser" />} />
+        <Route path="/reclamations" element={<PlaceholderPage title="Reklamationer" />} />
+        <Route path="/help" element={<PlaceholderPage title="Hjälp" />} />
+        <Route path="/notifications" element={<PlaceholderPage title="Notiser" />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AppShell>

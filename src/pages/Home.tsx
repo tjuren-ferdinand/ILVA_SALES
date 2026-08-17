@@ -1,44 +1,27 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { Search, X, ChevronRight, AlertCircle, Info } from 'lucide-react'
-import { FunctionCard } from '../components/ui/FunctionCard'
+import { Link } from 'react-router-dom'
+import { AlertCircle, Info, NotebookPen, Package, Users, Sofa, BarChart3 } from 'lucide-react'
+import { QuickCard } from '../components/ui/QuickCard'
+import { ToolCard } from '../components/ui/ToolCard'
 import { ProductCredit } from '../components/Branding/ProductCredit'
 import { Badge } from '../components/ui/Badge'
-import { topNav } from '../data/navItems'
 import { updates } from '../data/mockData'
+import { externalTools } from '../data/externalTools'
 import { ProfileHero } from '../components/Profile/ProfileHero'
 import type { UpdateItem } from '../types'
 
-const mainPaths = ['/offert', '/delivery', '/discounts', '/returns']
-
-const quickItems = [
-  { to: '/products', title: 'Sök ILVA-produkter', description: 'Riktig produktsökning för kunden' },
-  { to: '/discounts', title: 'Maxrabatter', description: 'Aktuella gränser' },
-  { to: '/delivery', title: 'Leverans per postnummer', description: 'Ange kundens postnummer' },
-  { to: '/returns', title: 'Returguide', description: 'Retur, reklamation & öppet köp' },
+const quickLinks = [
+  { to: '/orders', icon: Package, title: 'Ordrar', description: 'Hantera och hitta ordrar' },
+  { to: '/customers', icon: Users, title: 'Kunder', description: 'Kundrelaterade uppgifter' },
+  { to: '/products', icon: Sofa, title: 'Produkter', description: 'Produktinformation och sök' },
+  { to: 'https://timesalg.ilva.net/rpt_salg_daglig_time_SEK.htm', icon: BarChart3, title: 'Rapporter', description: 'Försäljningsstatistik', external: true },
 ]
 
-const functionDescriptions: Record<string, string> = {
-  Offert: 'Skapa & skicka till kund',
-  Leverans: 'Alternativ & priser',
-  Rabatter: 'Max rabatt per kategori',
-  Returer: 'Retur, reklamation & öppet köp',
-}
-
-function QuickRow({ to, title, description }: { to: string; title: string; description: string }) {
-  return (
-    <Link
-      to={to}
-      className="group flex items-center justify-between border-b border-border/40 py-3 text-foreground transition last:border-0 hover:text-foreground/80"
-    >
-      <div className="min-w-0">
-        <h4 className="truncate text-sm font-semibold">{title}</h4>
-        <p className="truncate text-xs text-muted">{description}</p>
-      </div>
-      <ChevronRight className="h-4 w-4 shrink-0 text-muted transition group-hover:translate-x-0.5" strokeWidth={1.5} />
-    </Link>
-  )
-}
+const overviewStats = [
+  { label: 'Dagens försäljning', value: '—', unit: 'kr' },
+  { label: 'Nya ordrar', value: '—' },
+  { label: 'Aktiva kunder', value: '—' },
+  { label: 'Konverteringsgrad', value: '—', unit: '%' },
+]
 
 function UpdateRow({ update }: { update: UpdateItem }) {
   return (
@@ -63,74 +46,54 @@ function UpdateRow({ update }: { update: UpdateItem }) {
 }
 
 export function Home() {
-  const [search, setSearch] = useState('')
-  const navigate = useNavigate()
-
-  const doSearch = () => {
-    const q = search.trim()
-    if (q) navigate(`/search?q=${encodeURIComponent(q)}`)
-  }
-
-  const functions = topNav
-    .filter((item) => mainPaths.includes(item.path))
-    .sort((a, b) => mainPaths.indexOf(a.path) - mainPaths.indexOf(b.path))
-
   return (
-    <div className="space-y-5 md:space-y-6">
-      <section className="space-y-3">
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.5} />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && doSearch()}
-            placeholder="Vad letar du efter?"
-            className="w-full rounded-2xl border border-white/40 bg-white/40 py-3 pl-11 pr-10 text-sm text-foreground outline-none backdrop-blur-xl placeholder:text-muted transition focus:border-white/60 focus:bg-white/60"
-            autoComplete="off"
-          />
-          {search && (
-            <button
-              type="button"
-              onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted transition hover:bg-white/40 hover:text-foreground"
-              aria-label="Rensa"
-            >
-              <X className="h-4 w-4" strokeWidth={1.5} />
-            </button>
-          )}
-        </div>
+    <div className="space-y-8">
+      <section className="space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Välkommen</h1>
+        <p className="text-sm text-muted">Här är din översikt och dina viktigaste verktyg.</p>
+      </section>
 
-        <ProfileHero variant="compact" />
+      <ProfileHero variant="compact" />
+
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {quickLinks.map((item) => (
+          <QuickCard key={item.title} {...item} />
+        ))}
       </section>
 
       <section>
-        <div className="mb-3 text-xs font-medium uppercase tracking-wide text-muted">Huvudfunktioner</div>
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-muted">Översikt</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {functions.map((item) => (
-            <FunctionCard
-              key={item.path}
-              to={item.path}
-              icon={item.icon}
-              title={item.label}
-              description={functionDescriptions[item.label] || undefined}
-            />
+          {overviewStats.map((stat) => (
+            <div key={stat.label} className="surface p-4">
+              <div className="text-xs text-muted">{stat.label}</div>
+              <div className="mt-1 flex items-baseline gap-1">
+                <span className="text-2xl font-semibold text-foreground">{stat.value}</span>
+                {stat.unit ? <span className="text-sm text-muted">{stat.unit}</span> : null}
+              </div>
+            </div>
           ))}
         </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
         <div className="surface p-5">
-          <h2 className="mb-4 text-xs font-medium uppercase tracking-wide text-muted">Snabbt åtkomst</h2>
-          <div>
-            {quickItems.map((item) => (
-              <QuickRow key={item.to} {...item} />
+          <h2 className="mb-4 text-xs font-medium uppercase tracking-wide text-muted">Verktyg</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {externalTools.map((tool) => (
+              <ToolCard key={tool.title} {...tool} />
             ))}
           </div>
         </div>
 
         <div className="surface p-5">
-          <h2 className="mb-4 text-xs font-medium uppercase tracking-wide text-muted">Senaste uppdateringar</h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xs font-medium uppercase tracking-wide text-muted">Senaste uppdateringar</h2>
+            <Link to="/notes" className="flex items-center gap-1.5 text-xs font-medium text-muted transition hover:text-foreground">
+              <NotebookPen className="h-3.5 w-3.5" strokeWidth={1.5} />
+              Anteckningar
+            </Link>
+          </div>
           <div>
             {updates.slice(0, 3).map((update) => (
               <UpdateRow key={update.id} update={update} />

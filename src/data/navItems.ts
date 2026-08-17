@@ -1,10 +1,10 @@
 import {
   Home,
   Search,
-  Truck,
-  Percent,
   Package,
+  Users,
   Sofa,
+  Percent,
   RotateCcw,
   CreditCard,
   Monitor,
@@ -12,10 +12,11 @@ import {
   Bell,
   Star,
   Settings,
-  Users,
-  FileText,
   NotebookPen,
-  Wallet,
+  Tag,
+  AlertCircle,
+  HelpCircle,
+  MessageSquare,
 } from 'lucide-react'
 
 export type NavItem = {
@@ -26,23 +27,24 @@ export type NavItem = {
 
 export const topNav: NavItem[] = [
   { label: 'Hem', path: '/', icon: Home },
-  { label: 'Offert', path: '/offert', icon: FileText },
-  { label: 'Resurs', path: '/resurs', icon: Wallet },
   { label: 'Sök', path: '/search', icon: Search },
-  { label: 'Leverans', path: '/delivery', icon: Truck },
-  { label: 'Rabatter', path: '/discounts', icon: Percent },
-  { label: 'Beställningar', path: '/orders', icon: Package },
+  { label: 'Ordrar', path: '/orders', icon: Package },
   { label: 'Produkter', path: '/products', icon: Sofa },
+  { label: 'Kunder', path: '/customers', icon: Users },
+  { label: 'Rabatter', path: '/discounts', icon: Percent },
+  { label: 'Priser', path: '/prices', icon: Tag },
   { label: 'Returer', path: '/returns', icon: RotateCcw },
+  { label: 'Reklamationer', path: '/reclamations', icon: AlertCircle },
   { label: 'Betalning', path: '/payment', icon: CreditCard },
   { label: 'System', path: '/systems', icon: Monitor },
   { label: 'Kontakter', path: '/contacts', icon: Phone },
+  { label: 'Hjälp', path: '/help', icon: HelpCircle },
   { label: 'Uppdateringar', path: '/updates', icon: Bell },
-  { label: 'Profil', path: '/team', icon: Users },
+  { label: 'Favoriter', path: '/favorites', icon: Star },
   { label: 'Anteckningar', path: '/notes', icon: NotebookPen },
+  { label: 'Notiser', path: '/notifications', icon: MessageSquare },
 ]
 
 export const bottomNav: NavItem[] = [
-  { label: 'Favoriter', path: '/favorites', icon: Star },
-  { label: 'Data & admin', path: '/settings', icon: Settings },
+  { label: 'Inställningar', path: '/settings', icon: Settings },
 ]
