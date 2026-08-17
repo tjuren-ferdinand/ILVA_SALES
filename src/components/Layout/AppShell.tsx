@@ -6,10 +6,13 @@ import { ActiveUserBadge } from './ActiveUserBadge'
 import { Assistant } from '../AI/Assistant'
 import { LoginFlow } from '../Session/LoginFlow'
 import { useSession } from '../../hooks/useSession'
+import { useIdle } from '../../hooks/useIdle'
+import { Screensaver } from '../Idle/Screensaver'
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const [mobileOpen, setMobileOpen] = useState(false)
   const { isAuthenticated } = useSession()
+  const { idle, wake } = useIdle(120000, isAuthenticated)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   if (!isAuthenticated) {
     return (
@@ -31,6 +34,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <main className="relative z-10 m-4 flex-1 overflow-y-auto rounded-2xl bg-surface p-4 pt-20 shadow-2xl md:ml-[13rem] md:min-h-[calc(100vh-2rem)] md:rounded-[2rem] md:p-10 md:pt-10 print:m-0 print:ml-0 print:h-auto print:min-h-0 print:w-full print:max-w-none print:overflow-visible print:rounded-none print:bg-white print:p-0 print:shadow-none print:text-black">
           <TopBar />
           {children}
+      {isAuthenticated && idle && <Screensaver onWake={wake} />}
         </main>
       </div>
       <Assistant />
