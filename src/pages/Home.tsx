@@ -16,13 +16,6 @@ const quickLinks = [
   { to: 'https://timesalg.ilva.net/rpt_salg_daglig_time_SEK.htm', icon: BarChart3, title: 'Rapporter', description: 'Försäljningsstatistik', external: true },
 ]
 
-const overviewStats = [
-  { label: 'Dagens försäljning', value: '—', unit: 'kr' },
-  { label: 'Nya ordrar', value: '—' },
-  { label: 'Aktiva kunder', value: '—' },
-  { label: 'Konverteringsgrad', value: '—', unit: '%' },
-]
-
 function UpdateRow({ update }: { update: UpdateItem }) {
   return (
     <div className="flex items-start gap-3 border-b border-border/40 py-3 last:border-0">
@@ -59,21 +52,6 @@ export function Home() {
         {quickLinks.map((item) => (
           <QuickCard key={item.title} {...item} />
         ))}
-      </section>
-
-      <section>
-        <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-muted">Översikt</h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {overviewStats.map((stat) => (
-            <div key={stat.label} className="surface p-4">
-              <div className="text-xs text-muted">{stat.label}</div>
-              <div className="mt-1 flex items-baseline gap-1">
-                <span className="text-2xl font-semibold text-foreground">{stat.value}</span>
-                {stat.unit ? <span className="text-sm text-muted">{stat.unit}</span> : null}
-              </div>
-            </div>
-          ))}
-        </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
