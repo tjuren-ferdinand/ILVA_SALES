@@ -6,18 +6,20 @@ export function ToolCard({
   title,
   description,
   href,
+  file,
   command,
   icon: Icon,
 }: {
   title: string
   description: string
   href?: string
+  file?: string
   command?: string
   icon: LucideIcon
 }) {
   const [copied, setCopied] = useState(false)
 
-  const handleCommand = async () => {
+  const copyCommand = async () => {
     if (!command) return
     try {
       await navigator.clipboard.writeText(command)
@@ -25,6 +27,19 @@ export function ToolCard({
       setTimeout(() => setCopied(false), 2000)
     } catch {
       // ignore
+    }
+  }
+
+  const openFile = async () => {
+    if (!file) {
+      await copyCommand()
+      return
+    }
+    const fileUrl = 'file:///' + encodeURI(file.replace(/\\/g, '/'))
+    const win = window.open(fileUrl, '_blank')
+    if (!win) {
+      // Popup/file access blocked — give user the command to run manually
+      await copyCommand()
     }
   }
 
@@ -36,7 +51,7 @@ export function ToolCard({
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1">
           <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-          {(href || command) && (
+          {(href || file || command) && (
             copied ? (
               <Check className="h-3.5 w-3.5 text-emerald-600" strokeWidth={1.5} />
             ) : (
@@ -63,11 +78,11 @@ export function ToolCard({
     )
   }
 
-  if (command) {
+  if (file || command) {
     return (
       <button
         type="button"
-        onClick={handleCommand}
+        onClick={openFile}
         className="block w-full"
         aria-label={title}
       >

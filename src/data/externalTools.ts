@@ -13,6 +13,7 @@ export type ExternalTool = {
   title: string
   description: string
   href?: string
+  file?: string
   command?: string
   icon: LucideIcon
 }
@@ -57,7 +58,8 @@ export const externalTools: ExternalTool[] = [
   {
     title: 'AX Affärssystem',
     description: 'Öppna AX2012 (ILVA) via Remote Desktop.',
-    command: '%systemroot%\\system32\\mstsc.exe "C:\\Users\\SEHAL05\\AppData\\Roaming\\Microsoft\\Workspaces\\{A21CD5DE-5AC3-4263-8316-883A546F2187}\\Resource\\AX2012 (ILVA).rdp"',
+    file: 'C:\\Users\\SEHAL05\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\ILVA (RADC)\\AX2012 (ILVA).lnk',
+    command: 'cmd /c start "" "C:\\Users\\SEHAL05\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\ILVA (RADC)\\AX2012 (ILVA).lnk"',
     icon: Monitor,
   },
 ]
