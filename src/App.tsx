@@ -20,6 +20,7 @@ import { Notes } from './pages/Notes'
 import { OfferPage } from './features/offers/pages/OfferPage'
 import { NotFound } from './pages/NotFound'
 import { PlaceholderPage } from './pages/PlaceholderPage'
+import { Calculator } from './pages/Calculator'
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
         <Route path="/prices" element={<PlaceholderPage title="Priser" />} />
         <Route path="/reclamations" element={<PlaceholderPage title="Reklamationer" />} />
         <Route path="/help" element={<PlaceholderPage title="Hjälp" />} />
+        <Route path="/calculator" element={<Calculator />} />
         <Route path="/notifications" element={<PlaceholderPage title="Notiser" />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

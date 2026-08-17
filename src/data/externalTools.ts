@@ -7,12 +7,14 @@ import {
   Languages,
   Mail,
   Monitor,
+  Hash,
 } from 'lucide-react'
 
 export type ExternalTool = {
   title: string
   description: string
   href?: string
+  to?: string
   file?: string
   command?: string
   icon: LucideIcon
@@ -54,6 +56,12 @@ export const externalTools: ExternalTool[] = [
     description: 'Öppna ILVA Webmail.',
     href: 'https://webmail.ilva.dk/owa/auth/logon.aspx?replaceCurrent=1&url=https%3a%2f%2fwebmail.ilva.dk%2fowa%2f',
     icon: Mail,
+  },
+  {
+    title: 'Miniräknare',
+    description: 'Säljarens miniräknare för snabba kalkyler.',
+    to: '/calculator',
+    icon: Hash,
   },
   {
     title: 'AX Affärssystem',

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { ArrowUpRight, Check } from 'lucide-react'
 import { useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
@@ -6,6 +7,7 @@ export function ToolCard({
   title,
   description,
   href,
+  to,
   file,
   command,
   icon: Icon,
@@ -13,6 +15,7 @@ export function ToolCard({
   title: string
   description: string
   href?: string
+  to?: string
   file?: string
   command?: string
   icon: LucideIcon
@@ -51,7 +54,7 @@ export function ToolCard({
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1">
           <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-          {(href || file || command) && (
+          {(href || to || file || command) && (
             copied ? (
               <Check className="h-3.5 w-3.5 text-emerald-600" strokeWidth={1.5} />
             ) : (
@@ -75,6 +78,14 @@ export function ToolCard({
       >
         {content}
       </a>
+    )
+  }
+
+  if (to) {
+    return (
+      <Link to={to} className="block" aria-label={title}>
+        {content}
+      </Link>
     )
   }
 

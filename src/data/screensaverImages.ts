@@ -9,4 +9,7 @@
 //   '/screensaver/interior-06.jpg',
 // ]
 
-export const screensaverImages: string[] = []
+export const screensaverImages: string[] = [
+  '/screensaver/sakura.webp',
+  '/screensaver/katalog-sofaer-se.webp',
+]
