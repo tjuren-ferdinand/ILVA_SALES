@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { Sparkles, Send, X, MessageSquare, AlertCircle } from 'lucide-react'
+import { Sparkles, Send, X, MessageSquare, AlertCircle, Maximize2, Minimize2 } from 'lucide-react'
 import { sendChatMessage, type ChatMessage, type PageContext } from '../../lib/ai/gemini'
 import { useSession } from '../../hooks/useSession'
 import { topNav, bottomNav } from '../../data/navItems'
@@ -19,6 +19,7 @@ function buildPageContext(pathname: string, storeName?: string, sellerName?: str
 
 export function Assistant() {
   const [open, setOpen] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
@@ -67,6 +68,11 @@ export function Assistant() {
     }
   }
 
+  const handleClose = () => {
+    setOpen(false)
+    setExpanded(false)
+  }
+
   return (
     <>
       {!open && (
@@ -80,7 +86,13 @@ export function Assistant() {
       )}
 
       {open && (
-        <div className="fixed bottom-4 right-4 left-4 z-50 flex flex-col rounded-[2rem] border border-white/50 bg-white/85 p-4 shadow-2xl backdrop-blur-2xl md:bottom-6 md:right-6 md:left-auto md:h-[32rem] md:w-[26rem] print:hidden">
+        <div
+          className={`fixed z-50 flex flex-col border border-white/50 bg-white/85 shadow-2xl backdrop-blur-2xl transition-all duration-300 print:hidden ${
+            expanded
+              ? 'inset-0 rounded-none p-4 md:p-6'
+              : 'bottom-4 right-4 left-4 rounded-[2rem] p-4 md:bottom-6 md:right-6 md:left-auto md:h-[32rem] md:w-[26rem]'
+          }`}
+        >
           <div className="flex items-center justify-between pb-3">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-surface">
@@ -88,13 +100,26 @@ export function Assistant() {
               </div>
               <span className="font-semibold text-foreground">ILVA Säljassistent</span>
             </div>
-            <button
-              onClick={() => setOpen(false)}
-              className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-foreground/5"
-              aria-label="Stäng"
-            >
-              <X className="h-4 w-4 text-muted" strokeWidth={1.5} />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setExpanded((e) => !e)}
+                className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-foreground/5"
+                aria-label={expanded ? 'Förminska' : 'Expandera till helskärm'}
+              >
+                {expanded ? (
+                  <Minimize2 className="h-4 w-4 text-muted" strokeWidth={1.5} />
+                ) : (
+                  <Maximize2 className="h-4 w-4 text-muted" strokeWidth={1.5} />
+                )}
+              </button>
+              <button
+                onClick={handleClose}
+                className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-foreground/5"
+                aria-label="Stäng"
+              >
+                <X className="h-4 w-4 text-muted" strokeWidth={1.5} />
+              </button>
+            </div>
           </div>
 
           <div className="flex-1 space-y-4 overflow-y-auto px-1 py-2">
